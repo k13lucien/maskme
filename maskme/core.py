@@ -1,6 +1,7 @@
 import copy
 from maskme.strategies import STRATEGIES
 from typing import Any, Dict, List, Union
+from concurrent.futures import ProcessPoolExecutor
 
 class MaskMe:
     """
@@ -56,21 +57,18 @@ class MaskMe:
             data = data.setdefault(key, {})
         data[keys[-1]] = value
 
-    def mask(self, data: Union[Dict, List[Dict]]) -> Union[Dict, List[Dict]]:
+    def mask(self, data_iterator):
         """
-        Primary entry point to anonymize a single record or a list of records.
-
+        Anonymizes data record by record to save memory.
+        
         Args:
-            data (Union[Dict, List[Dict]]): The input data to be anonymized.
-
-        Returns:
-            Union[Dict, List[Dict]]: A deep copy of the input data with rules applied.
+            data_iterator (Iterable[Dict]): A generator or list of records.
+            
+        Yields:
+            Dict: The next anonymized record.
         """
-        cloned_data = copy.deepcopy(data)
-
-        if isinstance(cloned_data, list):
-            return [self._process_record(record) for record in cloned_data]
-        return self._process_record(cloned_data)
+        for record in data_iterator:
+            yield self._process_record(copy.deepcopy(record))
 
     def _process_record(self, record: Dict) -> Dict:
         """
