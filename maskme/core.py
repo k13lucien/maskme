@@ -1,4 +1,5 @@
 import copy
+from maskme.strategies import STRATEGIES
 from typing import Any, Dict, List, Union
 
 class MaskMe:
@@ -20,7 +21,7 @@ class MaskMe:
         """
         self.rules = rules
         self.salt = salt
-        self.strategies = {}
+        self.strategies = STRATEGIES
 
     def _get_nested(self, data: Dict, path: str) -> Any:
         """
@@ -73,7 +74,8 @@ class MaskMe:
 
     def _process_record(self, record: Dict) -> Dict:
         """
-        Applies anonymization rules to a single record.
+        Applies anonymization rules to a single record with support for 
+        parameterized strategies.
 
         Args:
             record (Dict): A single data record (dictionary).
@@ -81,9 +83,27 @@ class MaskMe:
         Returns:
             Dict: The processed record with anonymized fields.
         """
-        for path, strategy_name in self.rules.items():
+        for path, config in self.rules.items():
+            # Determine if config is a simple string or a dictionary with params
+            if isinstance(config, dict):
+                strategy_name = config.get("strategy")
+                params = {k: v for k, v in config.items() if k != "strategy"}
+            else:
+                strategy_name = config
+                params = {}
+
             current_val = self._get_nested(record, path)
-            if current_val is not None:
-                # Strategy invocation logic will be implemented here
-                pass
+            
+            if current_val is not None and strategy_name in STRATEGIES:
+
+                strategy_func = self.strategies[strategy_name]
+                
+                new_value = strategy_func(
+                    current_val, 
+                    salt=self.salt, 
+                    **params
+                )
+                
+                self._set_nested(record, path, new_value)
+                
         return record
