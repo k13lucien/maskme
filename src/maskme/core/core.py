@@ -70,6 +70,8 @@ class MaskMe:
         for record in data_iterator:
             yield self._process_record(copy.deepcopy(record))
 
+    # TODO: Add method for parallel processing using multiprocessing futures for large datasets.
+
     def _process_record(self, record: Dict) -> Dict:
         """
         Applies anonymization rules to a single record with support for 
