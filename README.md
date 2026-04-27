@@ -1,3 +1,3 @@
-<div align="center">
-    ![maskmebanner](banner.png)
-<div>
+<p align="center">
+  <img src="banner.png" />
+</p>
