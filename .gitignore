@@ -1,0 +1,22 @@
+# Environments
+venv/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Testing cache
+.pytest_cache/
+.coverage
+
+# Distribution / packaging
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
