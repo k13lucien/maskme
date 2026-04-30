@@ -46,7 +46,8 @@ def test_full_noise_pipeline_integration():
             "strategy": "noise",
             "sigma": 50.0,
             "min_val": 1000.0,
-            "precision": 2
+            "precision": 2,
+            "seed": 42
         }
     }
     
