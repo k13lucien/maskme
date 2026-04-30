@@ -2,6 +2,7 @@ from . import hashing
 from . import redaction
 from . import noise
 from . import generalization
+from . import noop
 
 # Registry of available strategies
 STRATEGIES = {
@@ -9,4 +10,5 @@ STRATEGIES = {
     "redact": redaction.apply,
     "noise": noise.apply,
     "generalize": generalization.apply,
+    "keep": noop.apply
 }
