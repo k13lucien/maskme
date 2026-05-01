@@ -6,33 +6,32 @@ on:
   pull_request:
     branches: [ main ]
 
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    
     strategy:
       matrix:
-        # Testing across multiple versions to ensure compatibility
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
-      # 1. Download the repository code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Correctly set up the Python environment
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5 
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      # 3. Install core and dev dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pytest numpy
           pip install -e .
 
-      # 4. Run the suite
       - name: Run Tests
         run: |
           pytest tests/
