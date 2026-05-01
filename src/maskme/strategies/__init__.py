@@ -3,6 +3,7 @@ from . import redaction
 from . import noise
 from . import generalization
 from . import noop
+from . import drop
 
 # Registry of available strategies
 STRATEGIES = {
@@ -10,5 +11,6 @@ STRATEGIES = {
     "redact": redaction.apply,
     "noise": noise.apply,
     "generalize": generalization.apply,
-    "keep": noop.apply
+    "keep": noop.apply,
+    "drop": drop.apply,
 }

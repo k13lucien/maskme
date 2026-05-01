@@ -56,6 +56,15 @@ class MaskMe:
         for key in keys[:-1]:
             data = data.setdefault(key, {})
         data[keys[-1]] = value
+    
+    def _delete_nested(self, data: Dict, path: str):
+        """Deletes a key in a nested dictionary via its path."""
+        parts = path.split(".")
+        for part in parts[:-1]:
+            data = data.get(part, {})
+        
+        if parts[-1] in data:
+            del data[parts[-1]]
 
     def mask(self, data_iterator):
         """
@@ -104,6 +113,9 @@ class MaskMe:
                     **params
                 )
                 
-                self._set_nested(record, path, new_value)
+                if new_value == "__DROP__":
+                    self._delete_nested(record, path)
+                else:
+                    self._set_nested(record, path, new_value)
                 
         return record
