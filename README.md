@@ -27,7 +27,7 @@ Every masking decision involves a fundamental trade-off: **the stronger the anon
  
 ```
 High Privacy  ◄─────────────────────────────► High Utility
-   suppress     hash    redact    noise    generalize    keep
+   drop     hash    redact    noise    generalize    keep
 ```
 
 ---
