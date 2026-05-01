@@ -20,6 +20,17 @@ MaskMe is built on the principle of **Format Agnosticism**. By decoupling the tr
 - **MaskMe CLI (Upcoming):** A high-performance interface for bulk file processing (CSV, JSONL, Parquet) with streaming support for multi-gigabyte datasets.
 
 ---
+
+### The Core Dilemma: Privacy vs. Utility
+ 
+Every masking decision involves a fundamental trade-off: **the stronger the anonymization, the less useful the data becomes**. MaskMe exposes this trade-off explicitly through its strategy system, letting you choose the right balance per field.
+ 
+```
+High Privacy  ◄─────────────────────────────► High Utility
+   suppress     hash    redact    noise    generalize    keep
+```
+
+---
  
 ## Key Features
  
@@ -28,6 +39,23 @@ MaskMe is built on the principle of **Format Agnosticism**. By decoupling the tr
 - **Context Aware:** Use the `keep` strategy to maintain sensitive analytical payloads (e.g., medical symptoms) while masking identities.
 - **Dot Notation:** Easily target nested fields (e.g., `user.internal.id`).
 - **Validation Suite:** Built-in analytics to measure MAE, Variance, and distribution shifts (Q-Q Plots).
+
+---
+ 
+## What Data Can Be Masked?
+ 
+MaskMe is designed to protect all major categories of sensitive data defined by international privacy regulations.
+ 
+| Category | Description | Examples |
+|---|---|---|
+| **PII** | Personally Identifiable Information | Name, Address, Email, SSN, Phone, Birth Date |
+| **PHI** | Protected Health Information (HIPAA) | Medical Record Numbers, Diagnoses, IP Addresses, Biometrics |
+| **PAN** | Primary Account Numbers (PCI DSS) | 14–16 digit credit/debit card numbers |
+| **Trade Secrets** | Confidential business or military data | Formulas, Codes, Internal IDs |
+ 
+> Privacy laws (GDPR, HIPAA, CCPA, FERPA) require that **direct identifiers** be encrypted or redacted, and **quasi-identifiers** be anonymized to prevent re-identification by combination.
+
+---
 
 ## Masking Strategies
  
@@ -79,6 +107,17 @@ data = {
 # 3. Apply Masking
 engine = MaskMe(rules)
 masked = engine.mask(data)
+```
+
+**Output:**
+```python
+{
+    "user": {"id": "a3f5c...", "email": "d**@m******.io"},
+    "metrics": {"salary": 5003.7},
+    "age": "20-30",
+    "symptom": "Flu",          # Unchanged — keep strategy
+    "metadata": "system_info"  # Unchanged — implicit passthrough
+}
 ```
  
 ---
