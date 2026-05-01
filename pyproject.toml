@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "maskme"
+version = "0.1.0"
+description = "A modular data anonymization tool"
+authors = [{name = "Lucien KIEMDE", email = "lucienkiemde4@gmail.com"}]
+dependencies = []
+requires-python = ">=3.8"
+
+[project.scripts]
+maskme = "maskme.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
