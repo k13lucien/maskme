@@ -1,14 +1,30 @@
 import argparse
 import json
+import logging
 import os
 import sys
+from contextlib import contextmanager
+from itertools import islice
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Generator, Optional, Tuple
 
 # Internal imports
 from maskme.core.core import MaskMe
 from maskme.io import get_handler
 from maskme.strategies import STRATEGIES
+
+# Constants
+DEFAULT_FORMAT = 'csv'
+PROGRESS_INTERVAL = 1000
+SUPPORTED_FORMATS = ['csv', 'json', 'jsonl']
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s: %(message)s',
+    stream=sys.stderr
+)
+logger = logging.getLogger(__name__)
 
 def detect_format(input_path: Optional[str], output_path: Optional[str]) -> str:
     """
@@ -18,11 +34,11 @@ def detect_format(input_path: Optional[str], output_path: Optional[str]) -> str:
     for path in [input_path, output_path]:
         if path:
             ext = Path(path).suffix.lower().lstrip('.')
-            if ext in ['csv', 'json', 'jsonl']:
+            if ext in SUPPORTED_FORMATS:
                 return ext
-    return 'csv'
+    return DEFAULT_FORMAT
 
-def validate_rules(rules: Dict[str, Any]):
+def validate_rules(rules: Dict[str, Any]) -> None:
     """
     Verifies that all strategies defined in the rules exist in the registry.
     """
@@ -33,31 +49,55 @@ def validate_rules(rules: Dict[str, Any]):
             invalid_strategies.append(f"{path}: {strategy_name}")
     
     if invalid_strategies:
-        print("Error: Invalid strategies found in rules:", file=sys.stderr)
-        for error in invalid_strategies:
-            print(f"  - {error}", file=sys.stderr)
+        logger.error("Invalid strategies found in rules:\n  - %s", "\n  - ".join(invalid_strategies))
         sys.exit(1)
 
 def load_rules(rules_path: str) -> Dict[str, Any]:
     """
     Safely loads the JSON configuration file for masking rules.
     """
-    path = Path(rules_path)
-    if not path.exists():
-        print(f"Error: Rules file not found at {rules_path}", file=sys.stderr)
-        sys.exit(1)
-    
     try:
-        with path.open('r', encoding='utf-8') as f:
+        with open(rules_path, 'r', encoding='utf-8') as f:
             return json.load(f)
+    except FileNotFoundError:
+        logger.error("Rules file not found at %s", rules_path)
+        sys.exit(1)
     except json.JSONDecodeError as e:
-        print(f"Error: Failed to parse rules JSON: {e}", file=sys.stderr)
+        logger.error("Failed to parse rules JSON: %s", e)
         sys.exit(1)
 
-def main():
+@contextmanager
+def get_streams(input_path: Optional[str], output_path: Optional[str]) -> Generator[Tuple[Any, Any], None, None]:
     """
-    Main entry point for the MaskMe CLI.
-    Orchestrates the flow: Input Stream -> Handler -> Core Engine -> Output Stream.
+    Context manager to safely handle input and output streams.
+    """
+    input_stream = open(input_path, 'r', encoding='utf-8') if input_path else sys.stdin
+    output_stream = open(output_path, 'w', encoding='utf-8', newline='') if output_path else sys.stdout
+    
+    try:
+        yield input_stream, output_stream
+    finally:
+        if input_path:
+            input_stream.close()
+        if output_path:
+            output_stream.close()
+
+def tracking_iterator(it: Generator, interval: int = PROGRESS_INTERVAL) -> Generator:
+    """
+    Yields items from an iterator and logs progress at regular intervals.
+    """
+    count = 0
+    for item in it:
+        count += 1
+        if count % interval == 0:
+            logger.info("Processed %d records...", count)
+        yield item
+    
+    logger.info("Successfully processed %d records.", count)
+
+def parse_args() -> argparse.Namespace:
+    """
+    Defines and parses CLI arguments.
     """
     parser = argparse.ArgumentParser(
         description="MaskMe CLI: A modular tool for data anonymization and privacy.",
@@ -65,101 +105,53 @@ def main():
     )
     
     # Configuration
-    parser.add_argument(
-        "--rules", 
-        required=True, 
-        help="Path to the JSON file containing masking rules."
-    )
-    parser.add_argument(
-        "--salt", 
-        help="Global salt for cryptographic operations (overrides MASKME_SALT env var)."
-    )
+    parser.add_argument("--rules", required=True, help="Path to the JSON file containing masking rules.")
+    parser.add_argument("--salt", help="Global salt for cryptographic operations (overrides MASKME_SALT env var).")
     
     # Input/Output
-    parser.add_argument(
-        "--input", 
-        help="Path to the source file (reads from stdin if not provided)."
-    )
-    parser.add_argument(
-        "--output", 
-        help="Path to the destination file (writes to stdout if not provided)."
-    )
+    parser.add_argument("--input", help="Path to the source file (reads from stdin if not provided).")
+    parser.add_argument("--output", help="Path to the destination file (writes to stdout if not provided).")
     
     # Processing options
-    parser.add_argument(
-        "--format", 
-        choices=["csv", "json", "jsonl"], 
-        help="Data format. Inferred from file extensions if not provided."
-    )
-    parser.add_argument(
-        "--limit", 
-        type=int, 
-        help="Limit the number of records to process (useful for dry-runs)."
-    )
+    parser.add_argument("--format", choices=SUPPORTED_FORMATS, help="Data format. Inferred from file extensions if not provided.")
+    parser.add_argument("--limit", type=int, help="Limit the number of records to process (useful for dry-runs).")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging.")
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    # 1. Resolve Data Format
+def run_pipeline(args: argparse.Namespace) -> None:
+    """
+    Orchestrates the data masking pipeline.
+    """
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+
+    # 1. Configuration & Setup
     data_format = args.format or detect_format(args.input, args.output)
-
-    # 2. Initialize the I/O Handler
-    try:
-        handler = get_handler(data_format)
-    except ValueError as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
-
-    # 3. Load and Validate Masking Rules
     rules = load_rules(args.rules)
     validate_rules(rules)
-
-    # 4. Resolve Salt
-    salt = args.salt or os.getenv("MASKME_SALT", "")
-
-    # 5. Setup Streams
-    input_stream = open(args.input, 'r', encoding='utf-8') if args.input else sys.stdin
-    output_stream = open(args.output, 'w', encoding='utf-8', newline='') if args.output else sys.stdout
-
-    try:
-        # 6. Initialize Core Engine
-        engine = MaskMe(rules, salt=salt)
-        
-        # 7. Execute the Pipeline (Streaming Approach)
-        records_iterator = handler.read(input_stream)
-        
-        # Apply limit if requested
-        if args.limit is not None:
-            from itertools import islice
-            records_iterator = islice(records_iterator, args.limit)
-
-        masked_iterator = engine.mask(records_iterator)
-        
-        # Write results while tracking progress
-        count = 0
-        def tracking_iterator(it):
-            nonlocal count
-            for item in it:
-                count += 1
-                if count % 1000 == 0:
-                    print(f"  Processed {count} records...", file=sys.stderr)
-                yield item
-
-        handler.write(tracking_iterator(masked_iterator), output_stream)
-        
-        # Final success message
-        source = args.input if args.input else "stdin"
-        print(f"Successfully processed {count} records from {source} using {data_format} format.", file=sys.stderr)
-
-    except Exception as e:
-        print(f"Unexpected Runtime Error: {e}", file=sys.stderr)
-        sys.exit(1)
     
-    finally:
-        # 8. Clean up resources
-        if args.input:
-            input_stream.close()
-        if args.output:
-            output_stream.close()
+    salt = args.salt or os.getenv("MASKME_SALT", "")
+    handler = get_handler(data_format)
+    engine = MaskMe(rules, salt=salt)
+
+    # 2. Processing
+    with get_streams(args.input, args.output) as (input_stream, output_stream):
+        records = handler.read(input_stream)
+        
+        if args.limit is not None:
+            records = islice(records, args.limit)
+            
+        masked_records = engine.mask(records)
+        handler.write(tracking_iterator(masked_records), output_stream)
+
+def main():
+    try:
+        args = parse_args()
+        run_pipeline(args)
+    except Exception as e:
+        logger.error("Unexpected Runtime Error: %s", e)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
