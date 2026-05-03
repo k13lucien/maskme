@@ -16,8 +16,8 @@ In an era where data privacy is paramount (GDPR, HIPAA, Law 010), MaskMe provide
  
 MaskMe is built on the principle of **Format Agnosticism**. By decoupling the transformation logic from the file I/O, we ensure the library remains lightweight and infinitely adaptable.
  
-- **MaskMe Core (Current):** A pure Python engine that processes standard primitives (Dictionaries, Lists).
-- **MaskMe CLI (Upcoming):** A high-performance interface for bulk file processing (CSV, JSONL, Parquet) with streaming support for multi-gigabyte datasets.
+- **MaskMe Core:** A pure Python engine that processes standard primitives (Dictionaries, Lists).
+- **MaskMe CLI:** A high-performance interface for bulk file processing (CSV, JSON, JSONL) with streaming support for large datasets.
 
 ---
 
@@ -35,37 +35,24 @@ High Privacy  ◄─────────────────────
 ## Key Features
  
 - **Universal Support:** Designed for Structured (tables), Semi-Structured (nested JSON), and Unstructured (raw text) data.
-- **Privacy by Design:** 4 core strategies to balance anonymization and utility.
-- **Context Aware:** Use the `keep` strategy to maintain sensitive analytical payloads (e.g., medical symptoms) while masking identities.
+- **Privacy by Design:** 6 core strategies to balance anonymization and utility.
+- **Context Aware:** Use the `keep` strategy to maintain sensitive analytical payloads while masking identities.
 - **Dot Notation:** Easily target nested fields (e.g., `user.internal.id`).
-- **Validation Suite:** Built-in analytics to measure MAE, Variance, and distribution shifts (Q-Q Plots).
-
----
- 
-## What Data Can Be Masked?
- 
-MaskMe is designed to protect all major categories of sensitive data defined by international privacy regulations.
- 
-| Category | Description | Examples |
-|---|---|---|
-| **PII** | Personally Identifiable Information | Name, Address, Email, SSN, Phone, Birth Date |
-| **PHI** | Protected Health Information (HIPAA) | Medical Record Numbers, Diagnoses, IP Addresses, Biometrics |
-| **PAN** | Primary Account Numbers (PCI DSS) | 14–16 digit credit/debit card numbers |
-| **Trade Secrets** | Confidential business or military data | Formulas, Codes, Internal IDs |
- 
-> Privacy laws (GDPR, HIPAA, CCPA, FERPA) require that **direct identifiers** be encrypted or redacted, and **quasi-identifiers** be anonymized to prevent re-identification by combination.
+- **Validation Suite:** Built-in analytics to measure distribution shifts (Q-Q Plots).
+- **Streaming I/O:** Process multi-gigabyte datasets with constant memory usage.
 
 ---
 
 ## Masking Strategies
  
-| Strategy | Action | Best for... |
+| Strategy | Parameters | Best for... |
 |---|---|---|
-| `hash` | Deterministic SHA-256 + Salt | IDs, Usernames, Keys |
-| `redact` | Partial masking (`L****n`) | Emails, Names, PII |
-| `noise` | Gaussian Noise addition | Salaries, Ages, Metrics |
-| `generalize` | Bucketing & Hierarchies | Ages (`20-30`), Locations |
-| `keep` | (Explicit Identity) | Analytical Payloads (Symptoms) |
+| `hash` | `algo`, `salt` | IDs, Usernames, Keys (Deterministic) |
+| `redact` | `mask_char`, `visible_chars` | Emails, Names, PII |
+| `noise` | `sigma`, `min_val`, `max_val`, `precision`, `seed` | Salaries, Ages, Metrics (Diff. Privacy) |
+| `generalize` | `step`, `bins` | Ages (`20-30`), Locations |
+| `keep` | - | Analytical Payloads (Symptoms) |
+| `drop` | - | Irrelevant sensitive data |
 
 
 ## Getting Started
@@ -81,50 +68,52 @@ pip install -e .
 
 ### Library Usage Example
  
-MaskMe handles nested structures and preserves non-configured fields by default.
+MaskMe handles nested structures and parameterized rules.
  
 ```python
 from maskme import MaskMe
  
-# 1. Define your multi-type rules
+# 1. Define your multi-type rules with optional parameters
 rules = {
-    "user.id":       "hash",
+    "user.id":       {"strategy": "hash", "algo": "sha512"},
     "user.email":    "redact",
-    "metrics.salary": "noise",
-    "age":           "generalize",
-    "symptom":       "keep"  # Explicitly preserve important data
+    "metrics.salary": {"strategy": "noise", "sigma": 500, "precision": 2},
+    "age":           {"strategy": "generalize", "step": 10},
+    "symptom":       "keep"
 }
  
 # 2. Your data (Structured & Semi-Structured)
-data = {
-    "user": {"id": "USR-123", "email": "dev@maskme.io"},
-    "metrics": {"salary": 5000},
-    "age": 28,
-    "symptom": "Flu",
-    "metadata": "system_info"  # Implicitly kept
-}
+data = [
+    {
+        "user": {"id": "USR-123", "email": "dev@maskme.io"},
+        "metrics": {"salary": 5000},
+        "age": 28,
+        "symptom": "Flu"
+    }
+]
  
-# 3. Apply Masking
-engine = MaskMe(rules)
-masked = engine.mask(data)
+# 3. Apply Masking with a global salt
+engine = MaskMe(rules, salt="secret_pepper")
+masked = list(engine.mask(data))
 ```
 
-**Output:**
-```python
-{
-    "user": {"id": "a3f5c...", "email": "d**@m******.io"},
-    "metrics": {"salary": 5003.7},
-    "age": "20-30",
-    "symptom": "Flu",          # Unchanged — keep strategy
-    "metadata": "system_info"  # Unchanged — implicit passthrough
-}
+### CLI Usage Example
+
+MaskMe includes a powerful CLI for bulk processing.
+
+```bash
+# Process a CSV file and output to another file
+maskme --input data.csv --rules rules.json --format csv --output clean.csv
+
+# Use piping for streaming processing
+cat data.jsonl | maskme --rules rules.json --format jsonl > clean.jsonl
 ```
- 
+
 ---
  
 ## Analytics & Validation
  
-Don't take our word for it. MaskMe includes a validation module to ensure your masked data still makes sense for your Data Scientists.
+Ensure your masked data still makes sense for your Data Scientists.
  
 ```python
 from maskme.analytics import plot_utility_report
@@ -137,13 +126,12 @@ plot_utility_report(original_df, masked_df, column="salary")
  
 ## Roadmap & Planned Features
  
-We are actively working on expanding MaskMe into a full-scale Data Governance tool:
+We are actively working on expanding MaskMe:
  
-- [ ] **CLI Module:** `maskme --input data.csv --rules rules.json --output clean.csv`
 - [ ] **Adapters:** Native support for S3, SQL Databases, and Parquet files.
-- [ ] **Faker Integration:** Replace real names with realistic fake names.
-- [ ] **Streaming I/O:** Process massive datasets with constant memory usage.
-- [ ] **Format-Preserving Encryption (FPE):** Maintain string formats after encryption.
+- [ ] **Faker Integration:** Replace real names with realistic fake data.
+- [ ] **Advanced NLP:** Entity recognition (NER) for automated PII detection in raw text.
+- [ ] **Web UI:** A visual dashboard to configure rules and preview utility reports.
 
 ## License
  
