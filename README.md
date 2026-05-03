@@ -61,7 +61,7 @@ High Privacy  ◄─────────────────────
  
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/maskme.git
+git clone https://github.com/k13lucien/maskme
 cd maskme
 pip install -e .
 ```
