@@ -1,5 +1,5 @@
 import pytest
-from maskme.core.core import MaskMe
+from maskme.core.engine import MaskMe
 
 def test_drop_strategy_simple_field():
     """
