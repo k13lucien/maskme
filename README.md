@@ -133,6 +133,41 @@ We are actively working on expanding MaskMe:
 - [ ] **Advanced NLP:** Entity recognition (NER) for automated PII detection in raw text.
 - [ ] **Web UI:** A visual dashboard to configure rules and preview utility reports.
 
+## Citation
+
+If you use Maskme in your research, please cite it as:
+
+**BibTeX:**
+
+
+```bibtex
+@software{kiemde2026maskme,
+  author = {Kiemde, Lucien},
+  title = {MaskMe: Agnostic Python library for data anonymization},
+  year = {2026},
+  url = {https://github.com/k13lucien/maskme},
+  note = {Source code: https://github.com/k13lucien/maskme},
+  version = {0.1.0},
+  address = {Ouagadougou, Burkina Faso}
+}
+```
+
+**Vancouver:**
+```
+Kiemde L. MaskMe: Agnostic Python library for data anonymization [Computer software]. Version 0.1.0. Ouagadougou: 2026. Available from: https://github.com/k13lucien/maskme
+```
+
+**APA:**
+```
+Kiemde, L. (2026). MaskMe: Agnostic Python library for data anonymization (Version 0.1.0) [Computer software]. https://github.com/k13lucien/maskme
+```
+
+**MLA:**
+```
+Kiemde, Lucien. "MaskMe: Agnostic Python library for data anonymization." Version 0.1.0, 2026, https://github.com/k13lucien/maskme.
+```
+
+
 ## License
  
 Distributed under the MIT License. See `LICENSE` for more information.
