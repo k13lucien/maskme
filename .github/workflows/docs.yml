@@ -1,28 +1,24 @@
-site_name: MaskMe Documentation
-site_description: Professional framework for data anonymization and risk analysis.
+name: Deploy Docs
+on:
+  push:
+    branches: [ main ]
 
-theme:
-  name: material
-  palette:
-    scheme: slate
-  features:
-    - navigation.sections
-    - content.code.copy
-
-nav:
-  - Home: index.md
-  - Architecture: engine.md
-  - Strategies:
-      - Overview: strategies/reference.md
-
-markdown_extensions:
-  - pymdownx.arithmatex:
-      generic: true
-  - mkdocstrings:
-      handlers:
-        python:
-          setup_python_path: [src]
-
-extra_javascript:
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+          
+      - name: Install dependencies
+        run: |
+          pip install mkdocs-material mkdocstrings[python]
+          
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force

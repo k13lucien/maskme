@@ -1,13 +1,19 @@
-site_name: MaskMe
+site_name: MaskMe Documentation
+site_description: Professional framework for data anonymization and risk analysis.
+
 theme:
   name: material
   palette:
     scheme: slate
+  features:
+    - navigation.sections
+    - content.code.copy
 
 nav:
   - Home: index.md
   - Architecture: engine.md
-  - Strategies: strategies/reference.md
+  - Strategies:
+      - Overview: strategies/reference.md
 
 markdown_extensions:
   - pymdownx.arithmatex:
@@ -18,4 +24,5 @@ markdown_extensions:
           setup_python_path: [src]
 
 extra_javascript:
-  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
