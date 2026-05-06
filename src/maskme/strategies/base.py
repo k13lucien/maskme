@@ -1,11 +1,12 @@
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Callable
 
-@runtime_checkable
-class Strategy(Protocol):
-    """
-    Interface (Protocol) that each strategy must adhere to.
-    Enables strong typing and simplified extensibility.
-    """
+# ---------------------------------------------------------------------------
+# Strategy function type alias
+# ---------------------------------------------------------------------------
 
-    def apply(self, value: Any, **kwargs) -> Any:
-        ...
+# All strategies are plain functions matching this signature.
+# The engine calls: apply(value, salt=..., **extra_params)
+StrategyFn = Callable[..., Any]
+
+# Returned by a strategy to signal that the field must be removed entirely.
+DROP_SENTINEL = "__DROP__"
