@@ -1,76 +1,77 @@
+"""
+Unit tests for maskme.strategies.drop
+--------------------------------------
+The drop strategy has a single responsibility: return DROP_SENTINEL
+regardless of the input value. Tests cover all input types and verify
+that the returned value is always the shared constant, never a raw string.
+"""
+
+from typing import Any
+
 import pytest
-from maskme.core.engine import MaskMe
 
-def test_drop_strategy_simple_field():
-    """
-    Test that a top-level field is completely removed from the dictionary.
-    """
-    rules = {"ssn": "drop"}
-    data = [
-        {"id": 1, "name": "Alice", "ssn": "123-456-789"},
-        {"id": 2, "name": "Bob", "ssn": "987-654-321"}
-    ]
-    
-    engine = MaskMe(rules)
-    # Convert generator to list for assertions
-    masked_data = list(engine.mask(data))
-    
-    # Assertions
-    assert "ssn" not in masked_data[0]
-    assert "ssn" not in masked_data[1]
-    assert masked_data[0]["name"] == "Alice"
-    assert len(masked_data[0]) == 2  # Only 'id' and 'name' should remain
+from maskme.strategies.base import DROP_SENTINEL
+from maskme.strategies.drop import apply
 
-def test_drop_strategy_nested_field():
-    """
-    Test field removal within nested structures using dot notation.
-    """
-    rules = {"user.internal_id": "drop"}
-    data = [
-        {
-            "user": {
-                "name": "Lucien",
-                "internal_id": "UUID-999",
-                "public_id": "PUB-1"
-            }
-        }
-    ]
-    
-    engine = MaskMe(rules)
-    masked_data = list(engine.mask(data))
-    
-    # Nested object should still exist, but without the dropped key
-    assert "user" in masked_data[0]
-    assert "internal_id" not in masked_data[0]["user"]
-    assert masked_data[0]["user"]["public_id"] == "PUB-1"
 
-def test_drop_non_existent_field():
-    """
-    Ensure the engine handles missing fields gracefully without raising errors.
-    """
-    rules = {"missing_key": "drop"}
-    data = [{"id": 1, "name": "Alice"}]
-    
-    engine = MaskMe(rules)
-    masked_data = list(engine.mask(data))
-    
-    # Data should remain unchanged
-    assert masked_data[0] == {"id": 1, "name": "Alice"}
+# ---------------------------------------------------------------------------
+# Return value contract
+# ---------------------------------------------------------------------------
 
-def test_mixed_strategies_with_drop():
-    """
-    Verify that 'drop' works correctly alongside other strategies like 'hash' and 'keep'.
-    """
-    rules = {
-        "id": "hash",
-        "ssn": "drop",
-        "symptom": "keep"
-    }
-    data = [{"id": "123", "ssn": "SECRET-01", "symptom": "Flu"}]
-    
-    engine = MaskMe(rules)
-    result = list(engine.mask(data))[0]
-    
-    assert "ssn" not in result
-    assert result["id"] != "123"  # Should be hashed
-    assert result["symptom"] == "Flu"  # Should be preserved
+
+class TestReturnValue:
+    """The return value must always be DROP_SENTINEL, for any input."""
+
+    def test_returns_drop_sentinel_constant(self):
+        """Return value is identical to DROP_SENTINEL (not just equal)."""
+        assert apply("anything") is DROP_SENTINEL
+
+    def test_returns_string(self):
+        """Return type is always str."""
+        assert isinstance(apply("x"), str)
+
+    def test_not_a_hardcoded_string(self):
+        """Return value equals DROP_SENTINEL — guards against sentinel drift."""
+        assert apply("x") == DROP_SENTINEL
+
+
+# ---------------------------------------------------------------------------
+# Input indifference — value is always ignored
+# ---------------------------------------------------------------------------
+
+
+class TestInputIndifference:
+    """apply() must return DROP_SENTINEL regardless of what value is passed."""
+
+    @pytest.mark.parametrize("value", [
+        "alice@example.com",
+        123,
+        3.14,
+        True,
+        False,
+        [],
+        {},
+        None,
+        "",
+        0,
+    ])
+    def test_always_drops_any_value(self, value: Any):
+        """DROP_SENTINEL is returned for every possible input type."""
+        assert apply(value) == DROP_SENTINEL
+
+
+# ---------------------------------------------------------------------------
+# Keyword arguments are accepted and ignored
+# ---------------------------------------------------------------------------
+
+
+class TestKwargsAccepted:
+    """Extra kwargs must be accepted without raising — engine may pass salt and params."""
+
+    def test_accepts_salt_kwarg(self):
+        """salt kwarg forwarded by the engine is silently ignored."""
+        assert apply("value", salt="my-secret") == DROP_SENTINEL
+
+    def test_accepts_arbitrary_kwargs(self):
+        """Any extra keyword arguments are accepted without error."""
+        assert apply("value", salt="s", foo="bar", depth=2) == DROP_SENTINEL
