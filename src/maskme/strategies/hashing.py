@@ -1,31 +1,45 @@
 import hashlib
+import warnings
 from typing import Any
 
-def apply(value: Any, salt: str = "", algo: str = "sha256", **kwargs) -> str:
+_DEFAULT_ALGO = "sha256"
+
+
+def apply(value: Any, salt: str = "", algo: str = _DEFAULT_ALGO, **kwargs) -> str:
     """
-    Transforms a value into a hash string using a specified algorithm.
+    Transform a value into a hex digest using a specified hashing algorithm.
+
+    The value and salt are concatenated before hashing. If the requested
+    algorithm is unavailable, a warning is emitted and sha256 is used as
+    a fallback.
 
     Args:
-        value (Any): The input value to be hashed.
-        salt (str): An optional string appended to the value before hashing.
-        algo (str): The hashing algorithm to use (e.g., 'sha256', 'sha512', 'blake2b').
-                    Defaults to 'sha256'.
-        **kwargs: Additional arguments.
+        value:    The input value to hash. Returns "" if None.
+        salt:     An optional string appended to the value before hashing.
+        algo:     The hashing algorithm to use (e.g. "sha256", "sha512",
+                  "blake2b"). Must be supported by hashlib. Defaults to
+                  "sha256".
+        **kwargs: Accepted for interface consistency; not used.
 
     Returns:
-        str: The hexadecimal representation of the hash. 
-             Returns an empty string if value is None.
+        The hexadecimal digest of the hashed value, or "" if value is None.
+
+    Raises:
+        No exception is raised for unsupported algorithms — a warning is
+        emitted and sha256 is used instead.
     """
     if value is None:
         return ""
 
-    prepared_string = f"{value}{salt}".encode('utf-8')
+    prepared = f"{value}{salt}".encode("utf-8")
 
-    # Check if the requested algorithm is supported by hashlib
     try:
-        hash_obj = hashlib.new(algo, prepared_string)
+        hash_obj = hashlib.new(algo, prepared)
     except ValueError:
-        # Fallback to sha256 if the algorithm is not supported
-        hash_obj = hashlib.sha256(prepared_string)
+        warnings.warn(
+            f"Unsupported hash algorithm '{algo}'. Falling back to sha256.",
+            stacklevel=2,
+        )
+        hash_obj = hashlib.new(_DEFAULT_ALGO, prepared)
 
     return hash_obj.hexdigest()
