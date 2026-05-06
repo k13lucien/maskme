@@ -48,11 +48,11 @@ High Privacy  ◄─────────────────────
 | Strategy | Parameters | Best for... |
 |---|---|---|
 | `hash` | `algo`, `salt` | IDs, Usernames, Keys (Deterministic) |
-| `redact` | `mask_char`, `visible_chars` | Emails, Names, PII |
-| `noise` | `sigma`, `min_val`, `max_val`, `precision`, `seed` | Salaries, Ages, Metrics (Diff. Privacy) |
-| `generalize` | `step`, `bins` | Ages (`20-30`), Locations |
+| `redact` | `char`, `mask_char`, `visible_chars` | Emails, Names, PII |
+| `noise` | `sigma`, `min_val`, `max_val`, `precision`, `seed`, `epsilon`, `sensitivity`, `delta` | Salaries, Ages, Metrics (Diff. Privacy) |
+| `generalize` | `step`, `bins` `depth`, `method` | Ages (`20-30`), Locations |
 | `keep` | - | Analytical Payloads (Symptoms) |
-| `drop` | - | Irrelevant sensitive data |
+| `drop` | - | Direct identifiers |
 
 
 ## Getting Started
