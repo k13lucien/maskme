@@ -1,0 +1,21 @@
+site_name: MaskMe
+theme:
+  name: material
+  palette:
+    scheme: slate
+
+nav:
+  - Home: index.md
+  - Architecture: engine.md
+  - Strategies: strategies/reference.md
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - mkdocstrings:
+      handlers:
+        python:
+          setup_python_path: [src]
+
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML
