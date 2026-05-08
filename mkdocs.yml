@@ -11,6 +11,7 @@ theme:
 
 nav:
   - Home: index.html
+  - Documentation: home.md
   - Architecture: engine.md
   - Strategies:
       - Overview: strategies/reference.md
