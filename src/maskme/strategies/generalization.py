@@ -217,8 +217,13 @@ def apply(
     if method in DATE_METHODS:
         return generalize_date(value, method=method, default=default)
 
-    if isinstance(value, (int, float)):
-        return generalize_numeric(value, step=step, bins=bins, method=method, default=default)
+    # Attempt numeric generalization if value is numeric or if numeric
+    # params/methods are specified (handles numeric values passed as strings).
+    if isinstance(value, (int, float)) or method in ("range", "floor") or step or bins:
+        try:
+            return generalize_numeric(value, step=step, bins=bins, method=method, default=default)
+        except (ValueError, TypeError):
+            pass
 
     if isinstance(value, str) and "," in value:
         return generalize_location(value, depth=depth, default=default)

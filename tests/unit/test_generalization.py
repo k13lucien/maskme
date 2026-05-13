@@ -279,6 +279,10 @@ class TestApply:
     def test_routes_float_to_numeric(self):
         assert apply(27.5, step=10) == "20-30"
 
+    def test_routes_numeric_string_to_numeric(self):
+        """String values that look like numbers should be generalized if step/bins provided."""
+        assert apply("25", step=10) == "20-30"
+
     def test_routes_numeric_with_bins(self):
         assert apply(27, bins=[0, 18, 25, 65]) == "25-65"
 
