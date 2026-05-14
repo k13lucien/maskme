@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction to MaskMe &mdash; MaskMe</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Architecture: The Anonymization Engine" href="architecture.html" />
+    <link rel="prev" title="API Reference" href="../reference/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            MaskMe
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/getting-started.html">Getting Started with MaskMe</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting-started.html#what-you-ll-learn">What You’ll Learn</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting-started.html#before-you-start">Before You Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting-started.html#installation">1. Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting-started.html#prepare-sample-data">2. Prepare Sample Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting-started.html#create-your-masking-rules">3. Create Your Masking Rules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/getting-started.html#strategy-breakdown">Strategy Breakdown</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting-started.html#run-the-masking-pipeline">4. Run the Masking Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting-started.html#verify-the-results">5. Verify the Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting-started.html#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/getting-started.html#next-steps">Next Steps</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">How-to Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../how-to/custom-strategy.html">How to Create a Custom Strategy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/custom-strategy.html#create-a-strategy-function">1. Create a Strategy Function</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/custom-strategy.html#register-the-strategy">2. Register the Strategy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../how-to/custom-strategy.html#use-it-in-your-rules">3. Use it in your Rules</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/strategies.html">Anonymization Strategies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/strategies.html#hash-strategy-hash">1. Hash Strategy (<code class="docutils literal notranslate"><span class="pre">hash</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/strategies.html#noise-strategy-noise">2. Noise Strategy (<code class="docutils literal notranslate"><span class="pre">noise</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/strategies.html#redaction-strategy-redact">3. Redaction Strategy (<code class="docutils literal notranslate"><span class="pre">redact</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/strategies.html#generalization-strategy-generalize">4. Generalization Strategy (<code class="docutils literal notranslate"><span class="pre">generalize</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/strategies.html#masking-strategy-mask">5. Masking Strategy (<code class="docutils literal notranslate"><span class="pre">mask</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/strategies.html#drop-strategy-drop">6. Drop Strategy (<code class="docutils literal notranslate"><span class="pre">drop</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api.html#maskme-engine">maskme.engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api.html#maskme.core.engine.MaskMe"><code class="docutils literal notranslate"><span class="pre">MaskMe</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../reference/api.html#maskme.core.engine.MaskMe.mask"><code class="docutils literal notranslate"><span class="pre">MaskMe.mask()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/api.html#maskme.strategies.hashing.apply"><code class="docutils literal notranslate"><span class="pre">apply()</span></code></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Explanation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to MaskMe</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-challenge">The Challenge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#key-capabilities">Key Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture: The Anonymization Engine</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#the-transformation-lifecycle">The Transformation Lifecycle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#design-principles">Design Principles</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MaskMe</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Introduction to MaskMe</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/explanation/introduction.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="introduction-to-maskme">
+<h1>Introduction to MaskMe<a class="headerlink" href="#introduction-to-maskme" title="Link to this heading"></a></h1>
+<p>MaskMe is a framework for data anonymization that lets you transform sensitive datasets into privacy-compliant versions while maintaining data utility for analysis.</p>
+<section id="the-challenge">
+<h2>The Challenge<a class="headerlink" href="#the-challenge" title="Link to this heading"></a></h2>
+<p>Organizations today face a critical challenge: how to unlock the value of data while protecting individual privacy. Regulations like GDPR and HIPAA demand anonymization, yet traditional approaches often destroy data utility entirely.</p>
+<p>MaskMe solves this by providing:</p>
+<ul class="simple">
+<li><p>Multiple anonymization strategies to balance privacy and utility</p></li>
+<li><p>Support for CSV, JSON, and JSONL formats</p></li>
+<li><p>Privacy metrics to measure residual risk</p></li>
+<li><p>Production-ready CLI and Python API</p></li>
+</ul>
+</section>
+<section id="key-capabilities">
+<h2>Key Capabilities<a class="headerlink" href="#key-capabilities" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Flexible Strategies</dt><dd><p>Six built-in methods: hashing, redaction, noise injection, generalization, drop, and no-op. Mix and match per field.</p>
+</dd>
+<dt>Multi-Format Support</dt><dd><p>CSV, JSON, JSONL with streaming architecture for large datasets.</p>
+</dd>
+<dt>Extensible</dt><dd><p>Register custom strategies for domain-specific anonymization logic.</p>
+</dd>
+<dt>Privacy Analytics</dt><dd><p>K-anonymity, L-diversity, T-closeness, and information loss metrics to quantify privacy-utility trade-offs.</p>
+</dd>
+</dl>
+</section>
+<section id="use-cases">
+<h2>Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Healthcare</strong>: Anonymize patient records for research while preserving clinical patterns</p></li>
+<li><p><strong>Finance</strong>: De-identify transactions for fraud detection models</p></li>
+<li><p><strong>E-Commerce</strong>: Mask user data in analytics while maintaining purchase trends</p></li>
+<li><p><strong>Government</strong>: Publish open datasets with privacy guarantees</p></li>
+<li><p><strong>Machine Learning</strong>: Create privacy-safe training datasets</p></li>
+</ul>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>Install MaskMe using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>maskme
+</pre></div>
+</div>
+<p>For development:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/yourusername/maskme.git
+<span class="nb">cd</span><span class="w"> </span>maskme
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<p><strong>Basic anonymization from the command line:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Anonymize a CSV file using a configuration</span>
+maskme<span class="w"> </span>--rules<span class="w"> </span>rules.json<span class="w"> </span>--input<span class="w"> </span>data.csv<span class="w"> </span>--output<span class="w"> </span>masked.csv
+</pre></div>
+</div>
+<p><strong>In Python:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.core.engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaskMe</span>
+
+<span class="c1"># Define anonymization rules using strategy names</span>
+<span class="n">rules</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;hash&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;phone&quot;</span><span class="p">:</span> <span class="s2">&quot;redact&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;redact&quot;</span>
+<span class="p">}</span>
+
+<span class="c1"># Initialize and run</span>
+<span class="n">masker</span> <span class="o">=</span> <span class="n">MaskMe</span><span class="p">(</span><span class="n">rules</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="s2">&quot;my-secret-salt&quot;</span><span class="p">)</span>
+<span class="n">anonymized_data</span> <span class="o">=</span> <span class="n">masker</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">sensitive_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../tutorials/getting-started.html"><span class="doc">Getting Started with MaskMe</span></a> — Complete tutorial with examples</p></li>
+<li><p><a class="reference internal" href="../how-to/custom-strategy.html"><span class="doc">How to Create a Custom Strategy</span></a> — Build custom anonymization logic</p></li>
+<li><p><a class="reference internal" href="../reference/api.html"><span class="doc">API Reference</span></a> — Full API reference</p></li>
+<li><p><a class="reference internal" href="architecture.html"><span class="doc">Architecture: The Anonymization Engine</span></a> — Understand the design philosophy</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../reference/api.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="architecture.html" class="btn btn-neutral float-right" title="Architecture: The Anonymization Engine" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, MaskMe Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
