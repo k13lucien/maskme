@@ -1,0 +1,220 @@
+/* Custom MaskMe Theme Enhancement */
+
+/* Root colors and variables */
+:root {
+    --maskme-primary: #556B2F;
+    --maskme-cream: #FFFDD0;
+    --maskme-dark: #3a3a3a;
+    --maskme-light: #f9f9f9;
+}
+
+/* Hero Section Styling */
+.hero-section {
+    background: linear-gradient(135deg, var(--maskme-primary) 0%, #6B7C39 100%) !important;
+    color: white !important;
+    border-radius: 12px !important;
+    padding: 50px 30px !important;
+    margin: 40px 0 !important;
+    text-align: center !important;
+    box-shadow: 0 4px 6px rgba(85, 107, 47, 0.15) !important;
+}
+
+.hero-section h1 {
+    color: white !important;
+    font-size: 2.5em !important;
+    margin-bottom: 15px !important;
+    font-weight: 700 !important;
+}
+
+.hero-section p {
+    color: var(--maskme-cream) !important;
+    font-size: 1.2em !important;
+    margin-bottom: 0 !important;
+}
+
+/* Feature Cards */
+.feature-card {
+    background: linear-gradient(135deg, var(--maskme-cream) 0%, #FFFFF0 100%) !important;
+    border: 2px solid var(--maskme-primary) !important;
+    border-radius: 8px !important;
+    padding: 25px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 8px rgba(85, 107, 47, 0.1) !important;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 8px 20px rgba(85, 107, 47, 0.25) !important;
+}
+
+.feature-card h3 {
+    color: var(--maskme-primary) !important;
+    font-size: 1.3em !important;
+    margin-bottom: 12px !important;
+}
+
+/* Doc Grid Cards */
+.doc-card {
+    display: block !important;
+    border: 2px solid var(--maskme-primary) !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    text-align: center !important;
+    background: linear-gradient(135deg, var(--maskme-cream) 0%, #FFFFF0 100%) !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    transition: all 0.3s ease !important;
+}
+
+.doc-card:hover {
+    background: linear-gradient(135deg, var(--maskme-primary) 0%, #6B7C39 100%) !important;
+    color: white !important;
+    transform: translateY(-4px) !important;
+}
+
+.doc-card h4 {
+    margin: 0 0 8px 0 !important;
+    font-size: 1.2em !important;
+    font-weight: 600 !important;
+}
+
+.doc-card p {
+    margin: 0 !important;
+    font-size: 0.95em !important;
+}
+
+/* Admonition styling */
+.admonition {
+    border-left: 5px solid var(--maskme-primary) !important;
+    background: linear-gradient(90deg, var(--maskme-cream) 0%, #FFFFF0 100%) !important;
+    border-radius: 6px !important;
+    padding: 15px 20px !important;
+}
+
+.admonition-title {
+    color: var(--maskme-primary) !important;
+    font-weight: 700 !important;
+    margin-bottom: 8px !important;
+}
+
+/* Code block styling */
+.highlight {
+    border-radius: 6px !important;
+    border-left: 4px solid var(--maskme-primary) !important;
+}
+
+/* Table styling */
+table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 20px 0 !important;
+}
+
+table thead {
+    background: linear-gradient(90deg, var(--maskme-primary) 0%, #6B7C39 100%) !important;
+    color: white !important;
+}
+
+table th {
+    padding: 12px !important;
+    text-align: left !important;
+    font-weight: 600 !important;
+}
+
+table td {
+    padding: 10px !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+}
+
+table tbody tr:nth-child(odd) {
+    background: var(--maskme-cream) !important;
+}
+
+table tbody tr:hover {
+    background: #FFF8DC !important;
+}
+
+/* Link styling */
+a {
+    color: var(--maskme-primary) !important;
+    text-decoration: none !important;
+    border-bottom: 2px solid transparent !important;
+    transition: all 0.2s ease !important;
+}
+
+a:hover {
+    border-bottom-color: var(--maskme-primary) !important;
+}
+
+/* Header styling */
+h1, h2, h3 {
+    border-bottom: 2px solid var(--maskme-cream) !important;
+    padding-bottom: 10px !important;
+}
+
+h1 {
+    color: var(--maskme-primary) !important;
+    font-size: 2.2em !important;
+}
+
+h2 {
+    color: var(--maskme-primary) !important;
+    font-size: 1.8em !important;
+}
+
+h3 {
+    color: var(--maskme-primary) !important;
+    font-size: 1.4em !important;
+}
+
+/* Sidebar enhancement */
+aside {
+    background: linear-gradient(180deg, var(--maskme-cream) 0%, #FFFFF0 100%) !important;
+}
+
+/* Button styling */
+button, .btn {
+    background: var(--maskme-primary) !important;
+    color: white !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+}
+
+button:hover, .btn:hover {
+    background: #6B7C39 !important;
+    transform: scale(1.02) !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 1.8em !important;
+    }
+    
+    .features-grid,
+    .doc-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .feature-card,
+    .doc-card {
+        background: var(--maskme-dark) !important;
+        border-color: var(--maskme-cream) !important;
+    }
+    
+    .feature-card h3,
+    .doc-card h4 {
+        color: var(--maskme-cream) !important;
+    }
+    
+    table thead {
+        background: var(--maskme-dark) !important;
+    }
+    
+    table tbody tr:nth-child(odd) {
+        background: transparent !important;
+    }
+}

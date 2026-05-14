@@ -1,0 +1,63 @@
+:root {
+    /* MaskMe Brand Palette */
+    --brand-olive: #556B2F;
+    --brand-cream: #FFFDD0;
+    --brand-white: #FFFFFF;
+
+    /* Apply branding by default (Light Mode) */
+    --color-brand-primary: var(--brand-olive);
+    --color-brand-content: var(--brand-olive);
+    --color-background-secondary: var(--brand-cream);
+    --color-admonition-background: var(--brand-cream);
+}
+
+/* Dark Mode Overrides - Reverting to accessible defaults */
+[data-theme="dark"] {
+    --color-brand-primary: var(--brand-cream); /* Cream links look better on dark */
+    --color-brand-content: var(--brand-cream);
+    --color-background-secondary: #1a1c1e;    /* Default dark background */
+    --color-admonition-background: #2d2f31;
+}
+
+/* Base layout adjustments */
+body {
+    background-color: var(--color-background-primary);
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-brand-primary);
+}
+
+/* Link and brand colors */
+a {
+    color: var(--color-brand-primary);
+}
+
+/* Sidebar styling - Subtle cream background */
+aside.left-sidebar {
+    background-color: var(--color-background-secondary) !important;
+}
+
+/* Navigation highlights */
+nav a.current {
+    color: var(--color-brand-primary) !important;
+    font-weight: 600;
+}
+
+/* Code blocks - fix appearance */
+div.highlight {
+    border: 1px solid var(--color-background-border);
+    border-radius: 8px;
+}
+
+/* Tint code blocks only in light mode */
+html:not([data-theme="dark"]) div.highlight {
+    background-color: #fdfdf5 !important;
+}
+
+/* Admonitions (notes, tips) */
+div.admonition {
+    background-color: var(--color-admonition-background) !important;
+    border-left: 4px solid var(--color-brand-primary) !important;
+}
