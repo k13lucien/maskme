@@ -74,6 +74,11 @@
 <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/getting-started.html">Getting Started with MaskMe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/getting-started.html#part-1-your-first-anonymization">Part 1: Your First Anonymization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/getting-started.html#part-2-understanding-strategies">Part 2: Understanding Strategies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/getting-started.html#part-3-analyticsmeasuring-privacy">Part 3: Analytics—Measuring Privacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/getting-started.html#part-4-real-world-example">Part 4: Real-World Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/getting-started.html#next-steps">Next Steps</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">How-to Guides</span></p>
 <ul>
@@ -112,9 +117,133 @@
 <div id="content" role="main">
 <section id="introduction-to-maskme">
 <h1>Introduction to MaskMe</h1>
-<p>(Content to be written)</p>
+<section id="the-privacy-utility-challenge">
+<h2>The Privacy-Utility Challenge</h2>
+<p>Organizations today face a fundamental tension: <strong>how to extract value from data while protecting individual privacy</strong>.</p>
+<p><strong>The Problem:</strong></p>
+<ul class="simple">
+<li><p>Regulations (GDPR, HIPAA, CCPA) demand data minimization and anonymization</p></li>
+<li><p>Data scientists need rich, detailed datasets for meaningful analysis</p></li>
+<li><p>Traditional anonymization (removing identifiers) is insufficient — re-identification is possible through auxiliary information</p></li>
+<li><p>Naive anonymization destroys statistical properties, making data useless for analysis</p></li>
+</ul>
+<p><strong>Example</strong>: Removing names and IDs from healthcare data might seem safe, but combining age + postal code + diagnosis can re-identify individuals.</p>
+<p><strong>What MaskMe Solves:</strong></p>
+<p>MaskMe provides a principled, flexible framework for data anonymization that:</p>
+<ol class="arabic simple">
+<li><p><strong>Balances privacy and utility</strong>: Choose strategies that fit your privacy goals without destroying data value</p></li>
+<li><p><strong>Works with any format</strong>: CSV, JSON, JSONL — same logic across all</p></li>
+<li><p><strong>Is transparent</strong>: Measure privacy risk and data loss precisely</p></li>
+<li><p><strong>Scales effortlessly</strong>: Stream large datasets without loading everything into memory</p></li>
+<li><p><strong>Is extensible</strong>: Build custom strategies for domain-specific needs</p></li>
+</ol>
 </section>
-</div></div>
+<section id="core-concepts">
+<h2>Core Concepts</h2>
+<section id="anonymization-strategy">
+<h3>Anonymization Strategy</h3>
+<p>A <strong>strategy</strong> is a function that transforms a sensitive value to hide it while (optionally) keeping some utility.</p>
+<p>Examples:</p>
+<ul class="simple">
+<li><p><strong>Hash</strong>: Email → unreadable but consistent fingerprint</p></li>
+<li><p><strong>Redact</strong>: Phone → partially hidden (keep last 4 digits)</p></li>
+<li><p><strong>Drop</strong>: Delete the field entirely</p></li>
+<li><p><strong>Noise</strong>: Age 42 → 40 or 44 (statistical noise, distribution preserved)</p></li>
+<li><p><strong>Generalize</strong>: Postal code → state-level only</p></li>
+</ul>
+<p>Each strategy makes different privacy-utility trade-offs.</p>
+</section>
+<section id="quasi-identifier">
+<h3>Quasi-Identifier</h3>
+<p>A <strong>quasi-identifier</strong> is a combination of non-unique attributes that can identify someone.</p>
+<p>Example: Age (28) + State (CA) + Gender (F) might uniquely identify someone in a database, even if names are removed.</p>
+</section>
+<section id="privacy-metrics">
+<h3>Privacy Metrics</h3>
+<p>MaskMe measures privacy formally:</p>
+<ul class="simple">
+<li><p><strong>K-anonymity</strong>: Each person is indistinguishable from at least K-1 others</p></li>
+<li><p><strong>L-diversity</strong>: Sensitive attributes have sufficient variation within groups</p></li>
+<li><p><strong>T-closeness</strong>: Masked data distribution stays close to the original (utility check)</p></li>
+</ul>
+<p>These ensure anonymized data meets formal privacy definitions while preserving utility.</p>
+</section>
+</section>
+<section id="use-cases">
+<h2>Use Cases</h2>
+<section id="healthcare">
+<h3>Healthcare</h3>
+<p><strong>Problem</strong>: Share patient data for research without exposing identity.</p>
+<p><strong>Solution</strong>:
+- Hash diagnosis codes (preserve patterns for linkage)
+- Generalize dates (year only, not exact visit dates)
+- Drop patient IDs
+- Keep medication (non-sensitive) and aggregate outcomes</p>
+<p><strong>Result</strong>: Researchers can study treatment efficacy; individual identities are protected.</p>
+</section>
+<section id="finance">
+<h3>Finance</h3>
+<p><strong>Problem</strong>: Analyze fraud patterns without exposing customer data.</p>
+<p><strong>Solution</strong>:
+- Hash customer IDs (consistent, but unreadable)
+- Redact account numbers (show last 4 digits for support)
+- Add noise to transaction amounts (preserve statistical patterns)
+- Keep transaction type and merchant (needed for analysis)</p>
+<p><strong>Result</strong>: Fraud models work on realistic data; no personal information is exposed.</p>
+</section>
+<section id="e-commerce">
+<h3>E-Commerce</h3>
+<p><strong>Problem</strong>: Share user behavior data with analytics vendors.</p>
+<p><strong>Solution</strong>:
+- Drop user IDs
+- Hash IP addresses
+- Generalize location (country, not city)
+- Keep product categories (needed for recommendations)</p>
+<p><strong>Result</strong>: Vendor can build models; users remain anonymous.</p>
+</section>
+<section id="machine-learning">
+<h3>Machine Learning</h3>
+<p><strong>Problem</strong>: Create privacy-safe training datasets without bias.</p>
+<p><strong>Solution</strong>:
+- Hash sensitive attributes (protected class)
+- Generalize categorical features
+- Drop identifiers
+- Add noise to sensitive continuous variables</p>
+<p><strong>Result</strong>: Train models on realistic, anonymized data; meets GDPR and fairness standards.</p>
+</section>
+</section>
+<section id="design-philosophy">
+<h2>Design Philosophy</h2>
+<p><strong>Modular</strong>: Each strategy is independent. Mix and match as needed.</p>
+<p><strong>Composable</strong>: Apply different strategies to different fields in the same dataset.</p>
+<p><strong>Observable</strong>: Measure privacy rigorously; don’t guess.</p>
+<p><strong>Scalable</strong>: Stream data. Handle datasets larger than RAM.</p>
+<p><strong>Extensible</strong>: Write custom strategies for domain-specific rules.</p>
+<p><strong>Simple</strong>: Learn one mental model; apply everywhere (whether using CLI or Python API).</p>
+<p>Next: Head to the <a class="reference internal" href="../tutorials/getting-started.html"><span class="doc">Getting Started tutorial</span></a> to anonymize your first dataset.</p>
+</section>
+</section>
+</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
+<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
+<ul>
+<li><a :data-current="activeSection === '#the-privacy-utility-challenge'" class="reference internal" href="#the-privacy-utility-challenge">The Privacy-Utility Challenge</a></li>
+<li><a :data-current="activeSection === '#core-concepts'" class="reference internal" href="#core-concepts">Core Concepts</a><ul>
+<li><a :data-current="activeSection === '#anonymization-strategy'" class="reference internal" href="#anonymization-strategy">Anonymization Strategy</a></li>
+<li><a :data-current="activeSection === '#quasi-identifier'" class="reference internal" href="#quasi-identifier">Quasi-Identifier</a></li>
+<li><a :data-current="activeSection === '#privacy-metrics'" class="reference internal" href="#privacy-metrics">Privacy Metrics</a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#use-cases'" class="reference internal" href="#use-cases">Use Cases</a><ul>
+<li><a :data-current="activeSection === '#healthcare'" class="reference internal" href="#healthcare">Healthcare</a></li>
+<li><a :data-current="activeSection === '#finance'" class="reference internal" href="#finance">Finance</a></li>
+<li><a :data-current="activeSection === '#e-commerce'" class="reference internal" href="#e-commerce">E-Commerce</a></li>
+<li><a :data-current="activeSection === '#machine-learning'" class="reference internal" href="#machine-learning">Machine Learning</a></li>
+</ul>
+</li>
+<li><a :data-current="activeSection === '#design-philosophy'" class="reference internal" href="#design-philosophy">Design Philosophy</a></li>
+</ul>
+</div>
+</aside>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">
