@@ -1,12 +1,12 @@
 # Configuration file for the Sphinx documentation builder.
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../src'))
+sys.path.insert(0, os.path.abspath('../../src'))
 
 # -- Project information -----------------------------------------------------
-project = 'MaskMe'
-copyright = '2026, MaskMe Contributors'
-author = 'MaskMe Contributors'
+project = 'MaskMe Documentation'
+copyright = '2026, MIT License - Lucien KIEMDE - Code with purpose.'
+author = 'Lucien KIEMDE'
 release = '0.1.0'
 
 # -- General configuration ---------------------------------------------------
@@ -15,7 +15,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
-    'sphinx_copybutton',
     'sphinxawesome_theme',
 ]
 
@@ -26,8 +25,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 html_theme = 'sphinxawesome_theme'
 html_title = "MaskMe"
 html_static_path = ['_static']
+html_css_files = ['custom.css']
 
-# Désactiver les marqueurs de liens permanents (¶)
+# Désactiver les marqueurs de liens permanents
 html_permalinks = False
 
 # Configuration de la coloration syntaxique

@@ -26,7 +26,7 @@
 <meta content="How to Create a Custom Strategy | MaskMe" name="twitter:title"/>
 <link href="../_static/pygments.css?v=03e43079" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=979577e3" rel="stylesheet" type="text/css"/>
-<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/custom.css?v=2fb37986" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="../reference/strategies.html" rel="next" title="Anonymization Strategies"/>
@@ -112,51 +112,15 @@
 <div id="content" role="main">
 <section id="how-to-create-a-custom-strategy">
 <h1>How to Create a Custom Strategy</h1>
-<p>MaskMe is designed to be extensible. You can add your own anonymization logic by following these steps.</p>
-<section id="create-a-strategy-function">
-<h2>1. Create a Strategy Function</h2>
-<p>A strategy is a simple function that takes a value and returns a transformed one.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="k">def</span><span class="w"> </span><span class="nf">my_custom_strategy</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-</span><span id="line-2">    <span class="k">return</span> <span class="sa">f</span><span class="s2">"custom-</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span>
-</span></code></pre></div>
-</div>
+<p>(Content to be written)</p>
 </section>
-<section id="register-the-strategy">
-<h2>2. Register the Strategy</h2>
-<p>Add your function to the strategy registry in <code class="docutils literal notranslate"><span class="pre">src/maskme/strategies/__init__.py</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">.my_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">my_custom_strategy</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="n">STRATEGIES</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-4">    <span class="c1"># ...</span>
-</span><span id="line-5">    <span class="s2">"my_custom"</span><span class="p">:</span> <span class="n">my_custom_strategy</span><span class="p">,</span>
-</span><span id="line-6"><span class="p">}</span>
-</span></code></pre></div>
-</div>
-</section>
-<section id="use-it-in-your-rules">
-<h2>3. Use it in your Rules</h2>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
-</span><span id="line-2"><span class="w">  </span><span class="nt">"field"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my_custom"</span>
-</span><span id="line-3"><span class="p">}</span>
-</span></code></pre></div>
-</div>
-</section>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#create-a-strategy-function'" class="reference internal" href="#create-a-strategy-function">1. Create a Strategy Function</a></li>
-<li><a :data-current="activeSection === '#register-the-strategy'" class="reference internal" href="#register-the-strategy">2. Register the Strategy</a></li>
-<li><a :data-current="activeSection === '#use-it-in-your-rules'" class="reference internal" href="#use-it-in-your-rules">3. Use it in your Rules</a></li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">
 <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
 <div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2026, MaskMe Contributors Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 9.1.0</a></p>
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2026, MIT License - Lucien KIEMDE - Code with purpose. Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 9.1.0</a></p>
 </div>
 </div>
 </footer>
@@ -164,8 +128,6 @@
 <script src="../_static/documentation_options.js?v=01f34227"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-<script src="../_static/copybutton.js?v=f281be69"></script>
 <script defer="defer" src="../_static/theme.js?v=d6a9845b"></script>
 </body>
 </html>

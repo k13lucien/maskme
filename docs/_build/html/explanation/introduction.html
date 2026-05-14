@@ -26,7 +26,7 @@
 <meta content="Introduction to MaskMe | MaskMe" name="twitter:title"/>
 <link href="../_static/pygments.css?v=03e43079" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=979577e3" rel="stylesheet" type="text/css"/>
-<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/custom.css?v=2fb37986" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="architecture.html" rel="next" title="Architecture: The Anonymization Engine"/>
@@ -112,105 +112,15 @@
 <div id="content" role="main">
 <section id="introduction-to-maskme">
 <h1>Introduction to MaskMe</h1>
-<p>MaskMe is a framework for data anonymization that lets you transform sensitive datasets into privacy-compliant versions while maintaining data utility for analysis.</p>
-<section id="the-challenge">
-<h2>The Challenge</h2>
-<p>Organizations today face a critical challenge: how to unlock the value of data while protecting individual privacy. Regulations like GDPR and HIPAA demand anonymization, yet traditional approaches often destroy data utility entirely.</p>
-<p>MaskMe solves this by providing:</p>
-<ul class="simple">
-<li><p>Multiple anonymization strategies to balance privacy and utility</p></li>
-<li><p>Support for CSV, JSON, and JSONL formats</p></li>
-<li><p>Privacy metrics to measure residual risk</p></li>
-<li><p>Production-ready CLI and Python API</p></li>
-</ul>
+<p>(Content to be written)</p>
 </section>
-<section id="key-capabilities">
-<h2>Key Capabilities</h2>
-<dl class="simple">
-<dt>Flexible Strategies</dt><dd><p>Six built-in methods: hashing, redaction, noise injection, generalization, drop, and no-op. Mix and match per field.</p>
-</dd>
-<dt>Multi-Format Support</dt><dd><p>CSV, JSON, JSONL with streaming architecture for large datasets.</p>
-</dd>
-<dt>Extensible</dt><dd><p>Register custom strategies for domain-specific anonymization logic.</p>
-</dd>
-<dt>Privacy Analytics</dt><dd><p>K-anonymity, L-diversity, T-closeness, and information loss metrics to quantify privacy-utility trade-offs.</p>
-</dd>
-</dl>
-</section>
-<section id="use-cases">
-<h2>Use Cases</h2>
-<ul class="simple">
-<li><p><strong>Healthcare</strong>: Anonymize patient records for research while preserving clinical patterns</p></li>
-<li><p><strong>Finance</strong>: De-identify transactions for fraud detection models</p></li>
-<li><p><strong>E-Commerce</strong>: Mask user data in analytics while maintaining purchase trends</p></li>
-<li><p><strong>Government</strong>: Publish open datasets with privacy guarantees</p></li>
-<li><p><strong>Machine Learning</strong>: Create privacy-safe training datasets</p></li>
-</ul>
-</section>
-<section id="installation">
-<h2>Installation</h2>
-<p>Install MaskMe using pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">pip<span class="w"> </span>install<span class="w"> </span>maskme
-</span></code></pre></div>
-</div>
-<p>For development:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">git<span class="w"> </span>clone<span class="w"> </span>https://github.com/yourusername/maskme.git
-</span><span id="line-2"><span class="nb">cd</span><span class="w"> </span>maskme
-</span><span id="line-3">pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
-</span></code></pre></div>
-</div>
-</section>
-<section id="quick-start">
-<h2>Quick Start</h2>
-<p><strong>Basic anonymization from the command line:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="c1"># Anonymize a CSV file using a configuration</span>
-</span><span id="line-2">maskme<span class="w"> </span>--rules<span class="w"> </span>rules.json<span class="w"> </span>--input<span class="w"> </span>data.csv<span class="w"> </span>--output<span class="w"> </span>masked.csv
-</span></code></pre></div>
-</div>
-<p><strong>In Python:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.core.engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaskMe</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="c1"># Define anonymization rules using strategy names</span>
-</span><span id="line-4"><span class="n">rules</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-5">    <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"hash"</span><span class="p">,</span>
-</span><span id="line-6">    <span class="s2">"phone"</span><span class="p">:</span> <span class="s2">"redact"</span><span class="p">,</span>
-</span><span id="line-7">    <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"redact"</span>
-</span><span id="line-8"><span class="p">}</span>
-</span><span id="line-9">
-</span><span id="line-10"><span class="c1"># Initialize and run</span>
-</span><span id="line-11"><span class="n">masker</span> <span class="o">=</span> <span class="n">MaskMe</span><span class="p">(</span><span class="n">rules</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="s2">"my-secret-salt"</span><span class="p">)</span>
-</span><span id="line-12"><span class="n">anonymized_data</span> <span class="o">=</span> <span class="n">masker</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">sensitive_data</span><span class="p">)</span>
-</span></code></pre></div>
-</div>
-</section>
-<section id="next-steps">
-<h2>Next Steps</h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="../tutorials/getting-started.html"><span class="doc">Getting Started with MaskMe</span></a> — Complete tutorial with examples</p></li>
-<li><p><a class="reference internal" href="../how-to/custom-strategy.html"><span class="doc">How to Create a Custom Strategy</span></a> — Build custom anonymization logic</p></li>
-<li><p><a class="reference internal" href="../reference/api.html"><span class="doc">API Reference</span></a> — Full API reference</p></li>
-<li><p><a class="reference internal" href="architecture.html"><span class="doc">Architecture: The Anonymization Engine</span></a> — Understand the design philosophy</p></li>
-</ul>
-</section>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#the-challenge'" class="reference internal" href="#the-challenge">The Challenge</a></li>
-<li><a :data-current="activeSection === '#key-capabilities'" class="reference internal" href="#key-capabilities">Key Capabilities</a></li>
-<li><a :data-current="activeSection === '#use-cases'" class="reference internal" href="#use-cases">Use Cases</a></li>
-<li><a :data-current="activeSection === '#installation'" class="reference internal" href="#installation">Installation</a></li>
-<li><a :data-current="activeSection === '#quick-start'" class="reference internal" href="#quick-start">Quick Start</a></li>
-<li><a :data-current="activeSection === '#next-steps'" class="reference internal" href="#next-steps">Next Steps</a></li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">
 <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
 <div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2026, MaskMe Contributors Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 9.1.0</a></p>
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2026, MIT License - Lucien KIEMDE - Code with purpose. Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 9.1.0</a></p>
 </div>
 </div>
 </footer>
@@ -218,8 +128,6 @@
 <script src="../_static/documentation_options.js?v=01f34227"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-<script src="../_static/copybutton.js?v=f281be69"></script>
 <script defer="defer" src="../_static/theme.js?v=d6a9845b"></script>
 </body>
 </html>

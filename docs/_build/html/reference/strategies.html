@@ -26,7 +26,7 @@
 <meta content="Anonymization Strategies | MaskMe" name="twitter:title"/>
 <link href="../_static/pygments.css?v=03e43079" rel="stylesheet" type="text/css"/>
 <link href="../_static/theme.css?v=979577e3" rel="stylesheet" type="text/css"/>
-<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css"/>
+<link href="../_static/custom.css?v=2fb37986" rel="stylesheet" type="text/css"/>
 <link href="../search.html" rel="search" title="Search"/>
 <link href="../genindex.html" rel="index" title="Index"/>
 <link href="api.html" rel="next" title="API Reference"/>
@@ -112,73 +112,15 @@
 <div id="content" role="main">
 <section id="anonymization-strategies">
 <h1>Anonymization Strategies</h1>
-<p>MaskMe provides six primary strategies to address different privacy requirements.</p>
-<section id="hash-strategy-hash">
-<h2>1. Hash Strategy (<code class="docutils literal notranslate"><span class="pre">hash</span></code>)</h2>
-<ul class="simple">
-<li><p><strong>Logic</strong>: Irreversible pseudonymization using cryptographic hashing.</p></li>
-<li><p><strong>Formula</strong>: <span class="math notranslate nohighlight">\(y = H(x + \text{salt})\)</span></p></li>
-<li><p><strong>Best for</strong>: Unique identifiers (IDs, Usernames).</p></li>
-</ul>
+<p>(Content to be written)</p>
 </section>
-<section id="noise-strategy-noise">
-<h2>2. Noise Strategy (<code class="docutils literal notranslate"><span class="pre">noise</span></code>)</h2>
-<ul class="simple">
-<li><p><strong>Logic</strong>: Adds a random value within a specified range to numerical data.</p></li>
-<li><p><strong>Formula</strong>: <span class="math notranslate nohighlight">\(y = x + \epsilon, \text{where } \epsilon \in [-\text{range}, +\text{range}]\)</span></p></li>
-<li><p><strong>Best for</strong>: Salaries, ages, or sensor metrics.</p></li>
-</ul>
-</section>
-<section id="redaction-strategy-redact">
-<h2>3. Redaction Strategy (<code class="docutils literal notranslate"><span class="pre">redact</span></code>)</h2>
-<ul class="simple">
-<li><p><strong>Logic</strong>: Replaces the entire value with a static placeholder.</p></li>
-<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">John</span> <span class="pre">Doe</span></code> → <code class="docutils literal notranslate"><span class="pre">[REDACTED]</span></code></p></li>
-<li><p><strong>Best for</strong>: Names, emails, or physical addresses.</p></li>
-</ul>
-</section>
-<section id="generalization-strategy-generalize">
-<h2>4. Generalization Strategy (<code class="docutils literal notranslate"><span class="pre">generalize</span></code>)</h2>
-<ul class="simple">
-<li><p><strong>Logic</strong>: Reduces the precision of data by mapping values to intervals.</p></li>
-<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">Age:</span> <span class="pre">23</span></code> → <code class="docutils literal notranslate"><span class="pre">Age:</span> <span class="pre">20-30</span></code></p></li>
-<li><p><strong>Best for</strong>: Birth years or geographic locations to increase <strong>k-anonymity</strong>.</p></li>
-</ul>
-</section>
-<section id="masking-strategy-mask">
-<h2>5. Masking Strategy (<code class="docutils literal notranslate"><span class="pre">mask</span></code>)</h2>
-<ul class="simple">
-<li><p><strong>Logic</strong>: Hides parts of a string while keeping some characters visible for context.</p></li>
-<li><p><strong>Example</strong>: <code class="docutils literal notranslate"><span class="pre">4500-1234-5678</span></code> → <code class="docutils literal notranslate"><span class="pre">****-****-5678</span></code></p></li>
-<li><p><strong>Best for</strong>: Credit card numbers or phone numbers.</p></li>
-</ul>
-</section>
-<section id="drop-strategy-drop">
-<h2>6. Drop Strategy (<code class="docutils literal notranslate"><span class="pre">drop</span></code>)</h2>
-<ul class="simple">
-<li><p><strong>Logic</strong>: Entirely removes the column from the output dataset.</p></li>
-<li><p><strong>Best for</strong>: High-risk identifiers that are not needed for analysis (e.g., SSN).</p></li>
-</ul>
-</section>
-</section>
-</div></div><aside class="hidden text-sm xl:block" id="right-sidebar">
-<div class="sticky top-16 -mt-10 max-h-[calc(100vh-5rem)] h-full overflow-y-auto pt-6 space-y-2"><p class="font-medium">On this page</p>
-<ul>
-<li><a :data-current="activeSection === '#hash-strategy-hash'" class="reference internal" href="#hash-strategy-hash">1. Hash Strategy (<code class="docutils literal notranslate"><span class="pre">hash</span></code>)</a></li>
-<li><a :data-current="activeSection === '#noise-strategy-noise'" class="reference internal" href="#noise-strategy-noise">2. Noise Strategy (<code class="docutils literal notranslate"><span class="pre">noise</span></code>)</a></li>
-<li><a :data-current="activeSection === '#redaction-strategy-redact'" class="reference internal" href="#redaction-strategy-redact">3. Redaction Strategy (<code class="docutils literal notranslate"><span class="pre">redact</span></code>)</a></li>
-<li><a :data-current="activeSection === '#generalization-strategy-generalize'" class="reference internal" href="#generalization-strategy-generalize">4. Generalization Strategy (<code class="docutils literal notranslate"><span class="pre">generalize</span></code>)</a></li>
-<li><a :data-current="activeSection === '#masking-strategy-mask'" class="reference internal" href="#masking-strategy-mask">5. Masking Strategy (<code class="docutils literal notranslate"><span class="pre">mask</span></code>)</a></li>
-<li><a :data-current="activeSection === '#drop-strategy-drop'" class="reference internal" href="#drop-strategy-drop">6. Drop Strategy (<code class="docutils literal notranslate"><span class="pre">drop</span></code>)</a></li>
-</ul>
-</div>
-</aside>
+</div></div>
 </main>
 </div>
 </div><footer class="py-6 border-t border-border md:py-0">
 <div class="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
 <div class="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2026, MaskMe Contributors Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 9.1.0</a></p>
+<p class="text-sm leading-loose text-center text-muted-foreground md:text-left">© 2026, MIT License - Lucien KIEMDE - Code with purpose. Built with <a class="font-medium underline underline-offset-4" href="https://www.sphinx-doc.org" rel="noreferrer">Sphinx 9.1.0</a></p>
 </div>
 </div>
 </footer>
@@ -186,9 +128,6 @@
 <script src="../_static/documentation_options.js?v=01f34227"></script>
 <script src="../_static/doctools.js?v=fd6eb6e6"></script>
 <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
-<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
-<script src="../_static/copybutton.js?v=f281be69"></script>
 <script defer="defer" src="../_static/theme.js?v=d6a9845b"></script>
-<script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
 </body>
 </html>
