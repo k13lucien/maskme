@@ -76,7 +76,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started with MaskMe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#part-1-your-first-anonymization">Part 1: Your First Anonymization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#part-2-understanding-strategies">Part 2: Understanding Strategies</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#part-3-analyticsmeasuring-privacy">Part 3: Analytics—Measuring Privacy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#part-3-measuring-privacy-and-utility">Part 3: Measuring Privacy and Utility</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#part-4-real-world-example">Part 4: Real-World Example</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#next-steps">Next Steps</a></li>
 </ul>
@@ -127,7 +127,7 @@
 </ul>
 <section id="prerequisites">
 <h2>Prerequisites</h2>
-<p>MaskMe requires Python 3.8+. Install it now:</p>
+<p>MaskMe requires Python 3.9+. Install it now:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">pip<span class="w"> </span>install<span class="w"> </span>maskme
 </span></code></pre></div>
 </div>
@@ -150,10 +150,10 @@
 <p>Define a rules file that specifies which strategy to apply to each field:</p>
 <p><strong>Rules file</strong> (<code class="docutils literal notranslate"><span class="pre">rules.json</span></code>):</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
-</span><span id="line-2"><span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"drop"</span><span class="p">,</span>
-</span><span id="line-3"><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"redact"</span><span class="p">,</span>
-</span><span id="line-4"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hash"</span><span class="p">,</span>
-</span><span id="line-5"><span class="w">  </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"redact"</span><span class="p">,</span><span class="w"> </span><span class="nt">"keep_start"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"keep_end"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">},</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hash"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"drop"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"drop"</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">  </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"redact"</span><span class="p">,</span><span class="w"> </span><span class="nt">"char"</span><span class="p">:</span><span class="w"> </span><span class="s2">"X"</span><span class="p">,</span><span class="w"> </span><span class="nt">"keep_start"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">"keep_end"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">},</span>
 </span><span id="line-6"><span class="w">  </span><span class="nt">"region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keep"</span><span class="p">,</span>
 </span><span id="line-7"><span class="w">  </span><span class="nt">"purchase_count"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keep"</span>
 </span><span id="line-8"><span class="p">}</span>
@@ -168,17 +168,17 @@
 </span></code></pre></div>
 </div>
 <p><strong>Output:</strong></p>
-<div class="highlight-csv notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">name,email,phone,region,purchase_count
-</span><span id="line-2">****,d6d5d09f12b3f0f1a8a2c1e3b5e7d9f2,*****0101,US-CA,42
-</span><span id="line-3">****,5e6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e,*****0102,US-NY,15
-</span><span id="line-4">****,1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p,*****0103,US-TX,87
+<div class="highlight-csv notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">id,phone,region,purchase_count
+</span><span id="line-2">6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,XXXX0101,US-CA,42
+</span><span id="line-3">d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35,XXXX0102,US-NY,15
+</span><span id="line-4">4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce,XXXX0103,US-TX,87
 </span></code></pre></div>
 </div>
 <p>What happened:</p>
 <ul class="simple">
-<li><p><strong>id</strong>: Removed entirely (<code class="docutils literal notranslate"><span class="pre">drop</span></code>)</p></li>
-<li><p><strong>name</strong>: Completely redacted with <code class="docutils literal notranslate"><span class="pre">*</span></code> (<code class="docutils literal notranslate"><span class="pre">redact</span></code>)</p></li>
-<li><p><strong>email</strong>: Hashed (unreadable, but consistent for the same input)</p></li>
+<li><p><strong>id</strong>: Hashed (unreadable, but consistent for the same input)</p></li>
+<li><p><strong>name</strong>: Removed entirely (<code class="docutils literal notranslate"><span class="pre">drop</span></code>)</p></li>
+<li><p><strong>email</strong>: Removed entirely (<code class="docutils literal notranslate"><span class="pre">drop</span></code>)</p></li>
 <li><p><strong>phone</strong>: Last 4 digits kept, rest redacted (<code class="docutils literal notranslate"><span class="pre">keep_end:</span> <span class="pre">4</span></code>)</p></li>
 <li><p><strong>region</strong> and <strong>purchase_count</strong>: Left unchanged (<code class="docutils literal notranslate"><span class="pre">keep</span></code>)</p></li>
 </ul>
@@ -188,12 +188,12 @@
 </span><span id="line-3">
 </span><span id="line-4"><span class="c1"># Define rules (same as the JSON file)</span>
 </span><span id="line-5"><span class="n">rules</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="line-6">    <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"drop"</span><span class="p">,</span>
-</span><span id="line-7">    <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"redact"</span><span class="p">,</span>
-</span><span id="line-8">    <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"hash"</span><span class="p">,</span>
-</span><span id="line-9">    <span class="s2">"phone"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"strategy"</span><span class="p">:</span> <span class="s2">"redact"</span><span class="p">,</span> <span class="s2">"keep_start"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"keep_end"</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+</span><span id="line-6">    <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"hash"</span><span class="p">,</span>
+</span><span id="line-7">    <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"drop"</span><span class="p">,</span>
+</span><span id="line-8">    <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"drop"</span><span class="p">,</span>
+</span><span id="line-9">    <span class="s2">"phone"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"strategy"</span><span class="p">:</span> <span class="s2">"redact"</span><span class="p">,</span> <span class="s2">"char"</span><span class="p">:</span> <span class="s2">"X"</span><span class="p">,</span> <span class="s2">"keep_start"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">"keep_end"</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
 </span><span id="line-10">    <span class="s2">"region"</span><span class="p">:</span> <span class="s2">"keep"</span><span class="p">,</span>
-</span><span id="line-11">    <span class="s2">"purchase_count"</span><span class="p">:</span> <span class="s2">"keep"</span><span class="p">,</span>
+</span><span id="line-11">    <span class="s2">"purchase_count"</span><span class="p">:</span> <span class="s2">"keep"</span>
 </span><span id="line-12"><span class="p">}</span>
 </span><span id="line-13">
 </span><span id="line-14"><span class="c1"># Load data</span>
@@ -202,10 +202,10 @@
 </span><span id="line-17">    <span class="n">records</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
 </span><span id="line-18">
 </span><span id="line-19"><span class="c1"># Initialize engine</span>
-</span><span id="line-20"><span class="n">masker</span> <span class="o">=</span> <span class="n">MaskMe</span><span class="p">(</span><span class="n">rules</span><span class="p">)</span>
+</span><span id="line-20"><span class="n">engine</span> <span class="o">=</span> <span class="n">MaskMe</span><span class="p">(</span><span class="n">rules</span><span class="p">)</span>
 </span><span id="line-21">
 </span><span id="line-22"><span class="c1"># Process records</span>
-</span><span id="line-23"><span class="n">masked_records</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">masker</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">records</span><span class="p">))</span>
+</span><span id="line-23"><span class="n">masked_records</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">engine</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">records</span><span class="p">))</span>
 </span><span id="line-24">
 </span><span id="line-25"><span class="c1"># Save results</span>
 </span><span id="line-26"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"customers_masked.csv"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -220,17 +220,18 @@
 <h1>Part 2: Understanding Strategies</h1>
 <p>MaskMe provides six strategies. Each solves different privacy vs. utility trade-offs. Let’s explore when to use each.</p>
 <p><strong>Keeps the original value unchanged.</strong></p>
-<p>Use when: The field is already public, non-sensitive, or needed for analysis.</p>
+<p>Use when: The field is already public, non-sensitive, or represent key analytical dimensions.</p>
 <p>Example: Geographic region, product category, or timestamp.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">keep</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">noop</span>
 </span><span id="line-2">
 </span><span id="line-3"><span class="n">value</span> <span class="o">=</span> <span class="s2">"US-CA"</span>
-</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">keep</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">noop</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 </span><span id="line-5"><span class="c1"># result: "US-CA"</span>
 </span></code></pre></div>
 </div>
 <p><strong>Removes the field entirely.</strong></p>
-<p>Use when: The field is unnecessary and removing it reduces re-identification risk. IDs, internal references, or identifiers.</p>
+<p>Use when: The field is a direct identifier (PII) that could lead to re-identification, or if the field is unnecessary for the final dataset.</p>
+<p>Example: Names, email addresses, phone numbers, social security numbers.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">drop</span>
 </span><span id="line-2">
 </span><span id="line-3"><span class="n">value</span> <span class="o">=</span> <span class="mi">12345</span>
@@ -240,7 +241,7 @@
 </div>
 <p><strong>Converts the value into a fixed-length hexadecimal digest.</strong></p>
 <p>Use when: You need a consistent, one-way transformation (cannot be reversed).</p>
-<p>Common use: Email addresses, usernames, customer IDs when consistency is important.</p>
+<p>Common use: Usernames, customer IDs when consistency is important.</p>
 <p>Parameters:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">algo</span></code>: Hashing algorithm (default: <code class="docutils literal notranslate"><span class="pre">sha256</span></code>). Can be <code class="docutils literal notranslate"><span class="pre">sha512</span></code>, <code class="docutils literal notranslate"><span class="pre">blake2b</span></code>, etc.</p></li>
@@ -283,30 +284,31 @@
 </span><span id="line-6">
 </span><span id="line-7"><span class="c1"># Keep last 4 digits (credit card pattern)</span>
 </span><span id="line-8"><span class="n">result</span> <span class="o">=</span> <span class="n">redaction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-9">    <span class="s2">"4532-1234-5678-9012"</span><span class="p">,</span>
-</span><span id="line-10">    <span class="n">keep_end</span><span class="o">=</span><span class="mi">4</span>
-</span><span id="line-11"><span class="p">)</span>
-</span><span id="line-12"><span class="c1"># result: "****-****-****-9012"</span>
-</span><span id="line-13">
-</span><span id="line-14"><span class="c1"># Keep first and last</span>
-</span><span id="line-15"><span class="n">result</span> <span class="o">=</span> <span class="n">redaction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-16">    <span class="s2">"alice@example.com"</span><span class="p">,</span>
-</span><span id="line-17">    <span class="n">char</span><span class="o">=</span><span class="s2">"*"</span><span class="p">,</span>
-</span><span id="line-18">    <span class="n">keep_start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-</span><span id="line-19">    <span class="n">keep_end</span><span class="o">=</span><span class="mi">3</span>
-</span><span id="line-20"><span class="p">)</span>
-</span><span id="line-21"><span class="c1"># result: "a*****m.com"</span>
+</span><span id="line-9">    <span class="s2">"4532123456789012"</span><span class="p">,</span>
+</span><span id="line-10">    <span class="n">char</span><span class="o">=</span><span class="s2">"X"</span><span class="p">,</span>
+</span><span id="line-11">    <span class="n">keep_end</span><span class="o">=</span><span class="mi">4</span>
+</span><span id="line-12"><span class="p">)</span>
+</span><span id="line-13"><span class="c1"># result: "XXXXXXXXXXXX9012"</span>
+</span><span id="line-14">
+</span><span id="line-15"><span class="c1"># Keep first and last</span>
+</span><span id="line-16"><span class="n">result</span> <span class="o">=</span> <span class="n">redaction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+</span><span id="line-17">    <span class="s2">"alice@example.com"</span><span class="p">,</span>
+</span><span id="line-18">    <span class="n">char</span><span class="o">=</span><span class="s2">"*"</span><span class="p">,</span>
+</span><span id="line-19">    <span class="n">keep_start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="line-20">    <span class="n">keep_end</span><span class="o">=</span><span class="mi">3</span>
+</span><span id="line-21"><span class="p">)</span>
+</span><span id="line-22"><span class="c1"># result: "a*****m.com"</span>
 </span></code></pre></div>
 </div>
 <p><strong>Adds statistical noise while preserving overall distributions.</strong></p>
 <p>Use when: You need to keep numbers but make individual values unrecognizable.</p>
 <p>Common use: Purchase amounts, ages, salaries, temperatures.</p>
 <p>Two approaches:</p>
-<p><strong>Laplace Noise</strong> (small adjustments):</p>
+<p><strong>Gaussian Noise</strong> (simple noise control):</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">noise</span>
 </span><span id="line-2">
-</span><span id="line-3"><span class="c1"># Add Laplace noise with fixed scale</span>
-</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</span><span id="line-3"><span class="c1"># Add Gaussian noise with fixed sigma</span>
+</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </span><span id="line-5"><span class="c1"># result: 38 (or another value near 42)</span>
 </span></code></pre></div>
 </div>
@@ -314,16 +316,16 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="c1"># Use Gaussian mechanism for differential privacy</span>
 </span><span id="line-2"><span class="n">result</span> <span class="o">=</span> <span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
 </span><span id="line-3">    <span class="mi">42</span><span class="p">,</span>
-</span><span id="line-4">    <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>    <span class="c1"># Privacy budget (smaller = more private)</span>
-</span><span id="line-5">    <span class="n">delta</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>     <span class="c1"># Probability of breach</span>
-</span><span id="line-6">    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">10</span>  <span class="c1"># Max change when one person's data changes</span>
+</span><span id="line-4">    <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>      <span class="c1"># Privacy budget (smaller = more private)</span>
+</span><span id="line-5">    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>   <span class="c1"># Max change when one person's data changes</span>
+</span><span id="line-6">    <span class="n">delta</span><span class="o">=</span><span class="mf">1e-5</span>        <span class="c1"># Probability of breach (default)</span>
 </span><span id="line-7"><span class="p">)</span>
 </span><span id="line-8"><span class="c1"># Adds noise calibrated to (ε, δ)-differential privacy</span>
 </span></code></pre></div>
 </div>
 <p><strong>When to use each</strong>:</p>
 <ul class="simple">
-<li><p><strong>Laplace</strong>: Simple, intuitive noise for exploratory analysis.</p></li>
+<li><p><strong>Direct sigma</strong>: Simple noise for exploratory analysis.</p></li>
 <li><p><strong>Differential Privacy</strong>: Strong, formal privacy guarantees (GDPR-friendly).</p></li>
 </ul>
 <p><strong>Coarsens data to broader categories.</strong></p>
@@ -334,26 +336,17 @@
 </span><span id="line-3"><span class="c1"># Generalize date to year</span>
 </span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
 </span><span id="line-5">    <span class="s2">"2024-03-15"</span><span class="p">,</span>
-</span><span id="line-6">    <span class="n">method</span><span class="o">=</span><span class="s2">"date"</span><span class="p">,</span>
-</span><span id="line-7">    <span class="n">level</span><span class="o">=</span><span class="s2">"year"</span>
-</span><span id="line-8"><span class="p">)</span>
-</span><span id="line-9"><span class="c1"># result: "2024"</span>
-</span><span id="line-10">
-</span><span id="line-11"><span class="c1"># Generalize age to bracket (you need to define your brackets)</span>
-</span><span id="line-12"><span class="n">result</span> <span class="o">=</span> <span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-13">    <span class="mi">28</span><span class="p">,</span>
-</span><span id="line-14">    <span class="n">method</span><span class="o">=</span><span class="s2">"numeric_range"</span><span class="p">,</span>
-</span><span id="line-15">    <span class="n">ranges</span><span class="o">=</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">]]</span>
-</span><span id="line-16"><span class="p">)</span>
-</span><span id="line-17"><span class="c1"># result: [18, 30]  (28 falls in this bracket)</span>
-</span></code></pre></div>
-</div>
-<p><strong>Does nothing — value passes through unchanged.</strong></p>
-<p>Use as: Default behavior or explicit “don’t touch this” marker.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">noop</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="n">result</span> <span class="o">=</span> <span class="n">noop</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"anything"</span><span class="p">)</span>
-</span><span id="line-4"><span class="c1"># result: "anything"</span>
+</span><span id="line-6">    <span class="n">method</span><span class="o">=</span><span class="s2">"date_year"</span>
+</span><span id="line-7"><span class="p">)</span>
+</span><span id="line-8"><span class="c1"># result: "2024"</span>
+</span><span id="line-9">
+</span><span id="line-10"><span class="c1"># Generalize age to bracket with custom bins</span>
+</span><span id="line-11"><span class="n">result</span> <span class="o">=</span> <span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+</span><span id="line-12">    <span class="mi">28</span><span class="p">,</span>
+</span><span id="line-13">    <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+</span><span id="line-14">    <span class="n">method</span><span class="o">=</span><span class="s2">"range"</span>
+</span><span id="line-15"><span class="p">)</span>
+</span><span id="line-16"><span class="c1"># result: "18-30"</span>
 </span></code></pre></div>
 </div>
 <p>Use this decision tree:</p>
@@ -367,56 +360,8 @@
 </span></code></pre></div>
 </div>
 </section>
-<section id="part-3-analyticsmeasuring-privacy">
-<h1>Part 3: Analytics—Measuring Privacy</h1>
-<p>After anonymizing, you should verify the privacy-utility trade-off. MaskMe includes analytics to measure:</p>
-<ul class="simple">
-<li><p><strong>K-anonymity</strong>: How many records are indistinguishable</p></li>
-<li><p><strong>L-diversity</strong>: How diverse are quasi-identifiers</p></li>
-<li><p><strong>T-closeness</strong>: How close is the distribution to the original</p></li>
-<li><p><strong>Information loss</strong>: How much data utility is lost</p></li>
-</ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.analytics.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">kanonymity</span><span class="p">,</span> <span class="n">linformationloss</span>
-</span><span id="line-2"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.analytics.report</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate</span>
-</span><span id="line-3">
-</span><span id="line-4"><span class="c1"># Original and masked datasets</span>
-</span><span id="line-5"><span class="n">original_records</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>  <span class="c1"># Your original data</span>
-</span><span id="line-6"><span class="n">masked_records</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>    <span class="c1"># Your masked data</span>
-</span><span id="line-7">
-</span><span id="line-8"><span class="c1"># Compute K-anonymity</span>
-</span><span id="line-9"><span class="n">k</span> <span class="o">=</span> <span class="n">kanonymity</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
-</span><span id="line-10">    <span class="n">masked_records</span><span class="p">,</span>
-</span><span id="line-11">    <span class="n">quasi_identifiers</span><span class="o">=</span><span class="p">[</span><span class="s2">"region"</span><span class="p">,</span> <span class="s2">"purchase_count"</span><span class="p">]</span>
-</span><span id="line-12"><span class="p">)</span>
-</span><span id="line-13"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"K-anonymity: </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  <span class="c1"># Higher is better (≥5 is good)</span>
-</span><span id="line-14">
-</span><span id="line-15"><span class="c1"># Compute information loss</span>
-</span><span id="line-16"><span class="n">loss</span> <span class="o">=</span> <span class="n">linformationloss</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">original_records</span><span class="p">,</span> <span class="n">masked_records</span><span class="p">)</span>
-</span><span id="line-17"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Information loss: </span><span class="si">{</span><span class="n">loss</span><span class="si">:</span><span class="s2">.2%</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-18">
-</span><span id="line-19"><span class="c1"># Generate HTML report</span>
-</span><span id="line-20"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.analytics.report</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate</span>
-</span><span id="line-21">
-</span><span id="line-22"><span class="n">generate</span><span class="p">(</span>
-</span><span id="line-23">    <span class="n">results</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">],</span>  <span class="c1"># AnalyticResult objects</span>
-</span><span id="line-24">    <span class="n">output_path</span><span class="o">=</span><span class="s2">"privacy_report.html"</span><span class="p">,</span>
-</span><span id="line-25">    <span class="n">dataset_info</span><span class="o">=</span><span class="p">{</span>
-</span><span id="line-26">        <span class="s2">"records"</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">masked_records</span><span class="p">),</span>
-</span><span id="line-27">        <span class="s2">"source"</span><span class="p">:</span> <span class="s2">"customers.csv"</span>
-</span><span id="line-28">    <span class="p">}</span>
-</span><span id="line-29"><span class="p">)</span>
-</span></code></pre></div>
-</div>
-<dl class="simple">
-<dt><strong>K-anonymity ≥ 5</strong> (generally acceptable):</dt><dd><p>Each quasi-identifier combination appears at least 5 times. An attacker cannot narrow down an individual to fewer than 5 candidates.</p>
-</dd>
-<dt><strong>L-diversity ≥ 2</strong> (good):</dt><dd><p>For each quasi-identifier group, there are at least 2 diverse values in the sensitive attribute. Prevents attribute inference.</p>
-</dd>
-<dt><strong>T-closeness &lt; 0.1</strong> (good):</dt><dd><p>Masked distribution is close to the original. Less statistical distortion.</p>
-</dd>
-<dt><strong>Information loss &lt; 20%</strong> (good):</dt><dd><p>Most data utility is preserved.</p>
-</dd>
-</dl>
+<section id="part-3-measuring-privacy-and-utility">
+<h1>Part 3: Measuring Privacy and Utility</h1>
 </section>
 <section id="part-4-real-world-example">
 <h1>Part 4: Real-World Example</h1>
@@ -436,50 +381,24 @@
 </span><span id="line-2"><span class="w">  </span><span class="nt">"patient_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"drop"</span><span class="p">,</span>
 </span><span id="line-3"><span class="w">  </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 </span><span id="line-4"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
-</span><span id="line-5"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"numeric_range"</span><span class="p">,</span>
-</span><span id="line-6"><span class="w">    </span><span class="nt">"ranges"</span><span class="p">:</span><span class="w"> </span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">18</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="mi">65</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">65</span><span class="p">,</span><span class="w"> </span><span class="mi">120</span><span class="p">]]</span>
+</span><span id="line-5"><span class="w">    </span><span class="nt">"step"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
+</span><span id="line-6"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"range"</span>
 </span><span id="line-7"><span class="w">  </span><span class="p">},</span>
 </span><span id="line-8"><span class="w">  </span><span class="nt">"postal_code"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
 </span><span id="line-9"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
-</span><span id="line-10"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keep_prefix"</span><span class="p">,</span>
-</span><span id="line-11"><span class="w">    </span><span class="nt">"prefix_length"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
-</span><span id="line-12"><span class="w">  </span><span class="p">},</span>
-</span><span id="line-13"><span class="w">  </span><span class="nt">"diagnosis"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hash"</span><span class="p">,</span><span class="w"> </span><span class="nt">"salt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"healthcare-2026"</span><span class="p">},</span>
-</span><span id="line-14"><span class="w">  </span><span class="nt">"visit_date"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="line-15"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
-</span><span id="line-16"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"date"</span><span class="p">,</span>
-</span><span id="line-17"><span class="w">    </span><span class="nt">"level"</span><span class="p">:</span><span class="w"> </span><span class="s2">"year"</span>
-</span><span id="line-18"><span class="w">  </span><span class="p">},</span>
-</span><span id="line-19"><span class="w">  </span><span class="nt">"medication"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keep"</span>
-</span><span id="line-20"><span class="p">}</span>
+</span><span id="line-10"><span class="w">    </span><span class="nt">"depth"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+</span><span id="line-11"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-12"><span class="w">  </span><span class="nt">"diagnosis"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hash"</span><span class="p">,</span><span class="w"> </span><span class="nt">"salt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"healthcare-2026"</span><span class="p">},</span>
+</span><span id="line-13"><span class="w">  </span><span class="nt">"visit_date"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-14"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-15"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"date_year"</span>
+</span><span id="line-16"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-17"><span class="w">  </span><span class="nt">"medication"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keep"</span>
+</span><span id="line-18"><span class="p">}</span>
 </span></code></pre></div>
 </div>
 <p><strong>Run anonymization</strong>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">maskme<span class="w"> </span>--rules<span class="w"> </span>healthcare_rules.json<span class="w"> </span>--input<span class="w"> </span>visits.csv<span class="w"> </span>--output<span class="w"> </span>visits_masked.csv
-</span></code></pre></div>
-</div>
-<p><strong>Measure privacy</strong>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.analytics.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">kanonymity</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="c1"># Load original and masked data</span>
-</span><span id="line-4"><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
-</span><span id="line-5">
-</span><span id="line-6"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"visits.csv"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="line-7">    <span class="n">original</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-</span><span id="line-8">
-</span><span id="line-9"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"visits_masked.csv"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="line-10">    <span class="n">masked</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-</span><span id="line-11">
-</span><span id="line-12"><span class="c1"># Check k-anonymity on quasi-identifiers</span>
-</span><span id="line-13"><span class="n">k</span> <span class="o">=</span> <span class="n">kanonymity</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
-</span><span id="line-14">    <span class="n">masked</span><span class="p">,</span>
-</span><span id="line-15">    <span class="n">quasi_identifiers</span><span class="o">=</span><span class="p">[</span><span class="s2">"age"</span><span class="p">,</span> <span class="s2">"postal_code"</span><span class="p">,</span> <span class="s2">"visit_date"</span><span class="p">]</span>
-</span><span id="line-16"><span class="p">)</span>
-</span><span id="line-17">
-</span><span id="line-18"><span class="k">if</span> <span class="n">k</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>
-</span><span id="line-19">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✓ Privacy OK: K-anonymity = </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</span><span id="line-20"><span class="k">else</span><span class="p">:</span>
-</span><span id="line-21">    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✗ Privacy insufficient: K-anonymity = </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2"> (need ≥5)"</span><span class="p">)</span>
 </span></code></pre></div>
 </div>
 </section>
@@ -509,7 +428,7 @@
 </li>
 <li><a :data-current="activeSection === '#part-1-your-first-anonymization'" class="reference internal" href="#part-1-your-first-anonymization">Part 1: Your First Anonymization</a></li>
 <li><a :data-current="activeSection === '#part-2-understanding-strategies'" class="reference internal" href="#part-2-understanding-strategies">Part 2: Understanding Strategies</a></li>
-<li><a :data-current="activeSection === '#part-3-analyticsmeasuring-privacy'" class="reference internal" href="#part-3-analyticsmeasuring-privacy">Part 3: Analytics—Measuring Privacy</a></li>
+<li><a :data-current="activeSection === '#part-3-measuring-privacy-and-utility'" class="reference internal" href="#part-3-measuring-privacy-and-utility">Part 3: Measuring Privacy and Utility</a></li>
 <li><a :data-current="activeSection === '#part-4-real-world-example'" class="reference internal" href="#part-4-real-world-example">Part 4: Real-World Example</a></li>
 <li><a :data-current="activeSection === '#next-steps'" class="reference internal" href="#next-steps">Next Steps</a></li>
 </ul>

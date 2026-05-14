@@ -195,7 +195,7 @@ Redact
 Noise
 -----
 
-**Description**: Adds statistical noise to numeric values.
+**Description**: Adds Gaussian noise to numeric values.
 
 **When to use**:
 - Numeric fields: ages, salaries, amounts, measurements
@@ -209,42 +209,40 @@ Noise
    apply(
        value: Any,
        sigma: Optional[float] = None,
-       scale: Optional[float] = None,
-       epsilon: Optional[float] = None,
-       delta: Optional[float] = None,
-       sensitivity: Optional[float] = None,
        min_val: Optional[float] = None,
        max_val: Optional[float] = None,
        precision: Optional[int] = None,
+       seed: Optional[Any] = None,
+       epsilon: Optional[float] = None,
+       sensitivity: Optional[float] = None,
+       delta: float = 1e-5,
        **kwargs
-   ) -> float
+   ) -> Union[float, int, Any]
 
-**Parameters (Laplace Noise)**:
+**Parameters**:
 
-- ``scale`` (float): Laplace distribution scale parameter. Noise ~ Laplace(0, scale).
+- ``sigma`` (float): Standard deviation for direct Gaussian noise. Mutually exclusive with epsilon/sensitivity. Defaults to 1.0 if neither mode specified.
+- ``min_val`` / ``max_val`` (float): Clipping bounds. Result clipped to [min_val, max_val].
+- ``precision`` (int): Decimal places to round to (0 = return int).
+- ``seed`` (Optional[Any]): Seed for reproducible noise generation. Combined with sigma and value for consistency.
 
-**Parameters (Differential Privacy — Gaussian)**:
+**Differential Privacy Parameters** (mutually exclusive with sigma):
 
-- ``epsilon`` (float): Privacy budget. Smaller = more private. Must be > 0.
-- ``delta`` (float): Probability of failure. Typically 1e-5. Must be in (0, 1).
-- ``sensitivity`` (float): Maximum change in output when one individual's data changes. Must be > 0.
+- ``epsilon`` (float): Privacy budget ε. Smaller = stronger privacy. Must be > 0. Requires sensitivity.
+- ``sensitivity`` (float): L2-sensitivity Δf (max output change per person). Must be > 0. Requires epsilon.
+- ``delta`` (float): Probability of privacy breach δ. Must be in (0, 1). Defaults to 1e-5.
 
-**Optional Parameters (both modes)**:
+**Returns**: Noised numeric value (float or int if precision=0), or original value if non-numeric
 
-- ``min_val`` / ``max_val`` (float): Clipping bounds. Result is clipped to [min_val, max_val].
-- ``precision`` (int): Decimal places to round to (default: no rounding).
-
-**Returns**: Noised value (float)
-
-**Behavior — Laplace Noise**:
+**Behavior — Direct Mode** (using sigma):
 
 .. math::
 
-   x' = x + \text{Laplace}(0, \text{scale})
+   x' = x + \mathcal{N}(0, \sigma^2)
 
-Each value gets independent random noise. Good for exploratory analysis.
+Quick noise for exploratory analysis without formal privacy guarantees.
 
-**Behavior — Differential Privacy (Gaussian)**:
+**Behavior — Differential Privacy Mode** (using epsilon + sensitivity):
 
 .. math::
 
@@ -252,7 +250,7 @@ Each value gets independent random noise. Good for exploratory analysis.
 
    x' = x + \mathcal{N}(0, \sigma^2)
 
-Noise calibrated to guarantee (ε, δ)-differential privacy.
+Guarantees (ε, δ)-differential privacy per Dwork & Roth (2014).
 
 **Examples**:
 
@@ -260,36 +258,47 @@ Noise calibrated to guarantee (ε, δ)-differential privacy.
 
    from maskme.strategies import noise
 
-   # Laplace noise (simple case)
-   noise.apply(42, scale=5)  # → ~42 (varies each call)
+   # Direct Gaussian noise (simple case)
+   noise.apply(42, sigma=5)  # → ~42 (varies each call)
 
-   # Differential privacy (strong guarantee)
+   # Reproducible noise with seed
+   noise.apply(42, sigma=5, seed="my-seed")  # Same seed = same noise
+
+   # Differential privacy mode (strong guarantee)
    noise.apply(
        42,
-       epsilon=0.5,      # Moderate privacy
-       delta=1e-5,       # 0.001% breach probability
-       sensitivity=10    # Max change per person
+       epsilon=0.5,       # Privacy budget
+       sensitivity=10,    # Max change per person
+       delta=1e-5         # 0.001% breach probability
    )
-   # → ~42 (calibrated noise)
+   # → ~42 (calibrated noise with formal guarantee)
 
-   # Clipping + precision
+   # Clipping + rounding to integer
    noise.apply(
        28,
-       scale=3,
+       sigma=3,
        min_val=0,
        max_val=100,
-       precision=1
+       precision=0
    )
-   # → 27.3 (noise applied, clipped, rounded to 1 decimal)
+   # → 27 (noise applied, clipped to [0,100], rounded to int)
+
+   # Rounding to 2 decimals
+   noise.apply(
+       28.5,
+       sigma=1.5,
+       precision=2
+   )
+   # → 29.24
 
 **Privacy guarantee**:
-- **Laplace**: No formal guarantee (heuristic noise)
-- **Differential Privacy**: Formal (ε, δ)-DP guarantee (GDPR-friendly)
+- **Direct sigma**: No formal guarantee (heuristic noise)
+- **Differential Privacy** (epsilon + sensitivity): Formal (ε, δ)-DP guarantee (GDPR-friendly)
 
-**When to choose each**:
+**When to use each**:
 
-- **Laplace**: Quick exploratory analysis, understood by analysts
-- **Differential Privacy**: Regulatory requirements, strong privacy guarantees needed
+- **Direct sigma**: Quick anonymization, exploratory analysis, understood by analysts
+- **Differential Privacy**: Regulatory requirements, formal privacy guarantees needed
 
 Generalization
 ---------------
@@ -297,9 +306,9 @@ Generalization
 **Description**: Coarsens data to broader categories.
 
 **When to use**:
-- Dates (2024-03-15 → 2024)
-- Locations (city → state)
-- Ages (28 → [25, 35])
+- Dates (2024-03-15 → 2024 or 2024-03)
+- Locations (city → state/region)
+- Ages (28 → 25-30 or 20-30 bracket)
 - Any hierarchical categorization
 
 **Signature**:
@@ -308,68 +317,116 @@ Generalization
 
    apply(
        value: Any,
-       method: str = "keep_prefix",
-       level: Optional[str] = None,
-       ranges: Optional[List[List[float]]] = None,
-       prefix_length: Optional[int] = None,
+       step: Optional[Union[int, float]] = None,
+       bins: Optional[List[float]] = None,
+       depth: int = 1,
+       method: str = "range",
+       default: str = "Others",
        **kwargs
-   ) -> Any
+   ) -> Optional[str]
 
 **Parameters**:
 
-- ``method`` (str): Generalization method. Supported: "date", "numeric_range", "keep_prefix".
-- ``level`` (str): For date method. Options: "year", "month", "day".
-- ``ranges`` (List[List[float]]): For numeric_range. List of [min, max] boundaries.
-- ``prefix_length`` (int): For keep_prefix. Number of characters to keep.
+- ``step`` (Union[int, float]): Fixed step size for numeric values (e.g., 10 for age brackets). Mutually exclusive with bins.
+- ``bins`` (List[float]): Custom boundary list for numeric values (e.g., [0, 18, 65]). Mutually exclusive with step.
+- ``depth`` (int): For location strings (comma-separated). Number of leading parts to drop (default: 1).
+- ``method`` (str): Generalization strategy:
 
-**Examples — Date Generalization**:
+  - ``"range"``: Numeric interval (e.g., "20-30") — default for numeric
+  - ``"floor"``: Numeric floor only (e.g., "20")
+  - ``"date_year"``: Year only (e.g., "2024")
+  - ``"date_month"``: Year and month (e.g., "2024-03")
+
+- ``default`` (str): Fallback value when generalization fails (default: "Others").
+
+**Returns**: Generalized string, or None if input is None
+
+**Behavior — Numeric with step**:
+
+Step divides numeric values into fixed intervals.
+
+**Examples — Numeric Generalization**:
 
 .. code-block:: python
 
    from maskme.strategies import generalization
 
+   # Age bracket with step=10
+   generalization.apply(27, step=10, method="range")
+   # → "20-30"
+
+   generalization.apply(27, step=10, method="floor")
+   # → "20"
+
+   # Custom age brackets with bins
+   generalization.apply(27, bins=[0, 18, 30, 50, 100], method="range")
+   # → "18-30"
+
+   generalization.apply(12, bins=[0, 18, 30, 50, 100], method="range")
+   # → "0-18"
+
+   # Out of range
+   generalization.apply(10, bins=[18, 30, 50, 100], method="range")
+   # → "<18"
+
+   generalization.apply(85, bins=[0, 18, 65], method="range")
+   # → ">=65"
+
+**Behavior — Date Generalization**:
+
+Reduces date precision to year or year+month.
+
+**Examples — Date Generalization**:
+
+.. code-block:: python
+
    # Year only
-   generalization.apply("2024-03-15", method="date", level="year")
+   generalization.apply("2024-03-15", method="date_year")
    # → "2024"
 
    # Year and month
-   generalization.apply("2024-03-15", method="date", level="month")
+   generalization.apply("2024-03-15", method="date_month")
    # → "2024-03"
 
-   # Full date (no generalization)
-   generalization.apply("2024-03-15", method="date", level="day")
-   # → "2024-03-15"
+   # Also works with datetime objects
+   from datetime import datetime
+   dt = datetime(2024, 3, 15)
+   generalization.apply(dt, method="date_year")
+   # → "2024"
 
-**Examples — Numeric Range**:
+**Behavior — Location Generalization**:
 
-.. code-block:: python
+Removes leading parts from comma-separated location strings (most specific → less specific).
 
-   # Age brackets
-   ranges = [[0, 18], [18, 30], [30, 50], [50, 100]]
-   
-   generalization.apply(12, method="numeric_range", ranges=ranges)
-   # → [0, 18]
-   
-   generalization.apply(28, method="numeric_range", ranges=ranges)
-   # → [18, 30]
-
-**Examples — Prefix Keeping**:
+**Examples — Location Generalization**:
 
 .. code-block:: python
 
-   # Keep first 2 chars (postal code)
-   generalization.apply("12345", method="keep_prefix", prefix_length=2)
-   # → "12"
+   # Remove 1 part (city → region)
+   generalization.apply("Ouagadougou, Kadiogo, Centre", depth=1)
+   # → "Kadiogo, Centre"
 
-   # Keep first 5 chars (ZIP+4)
-   generalization.apply("12345-6789", method="keep_prefix", prefix_length=5)
-   # → "12345"
+   # Remove 2 parts (city+region → country)
+   generalization.apply("Ouagadougou, Kadiogo, Centre", depth=2)
+   # → "Centre"
 
 **Privacy guarantee**: K-anonymity-like (groups become indistinguishable)
 
 **Utility trade-off**: Coarsening reduces utility but preserves categorical/aggregate analysis
 
-**Note**: Generalization is often combined with other strategies (e.g., hash + generalize) for multi-layered privacy.
+**Common patterns**:
+
+.. code-block:: python
+
+   # Healthcare: age + year generalization
+   "age": {"strategy": "generalize", "step": 5, "method": "range"},
+   "visit_date": {"strategy": "generalize", "method": "date_year"},
+
+   # E-Commerce: postal code simplification
+   "postal_code": {"strategy": "generalize", "bins": [0, 10000, 20000, 30000, 100000], "method": "floor"},
+
+   # Public health: location generalization
+   "location": {"strategy": "generalize", "depth": 1}
 
 No-op
 -----

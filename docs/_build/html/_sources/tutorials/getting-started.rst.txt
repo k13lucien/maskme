@@ -13,7 +13,7 @@ By the end, you'll understand:
 Prerequisites
 -------------
 
-MaskMe requires Python 3.8+. Install it now:
+MaskMe requires Python 3.9+. Install it now:
 
 .. code-block:: bash
 
@@ -49,10 +49,10 @@ Define a rules file that specifies which strategy to apply to each field:
 .. code-block:: json
 
    {
-     "id": "drop",
-     "name": "redact",
-     "email": "hash",
-     "phone": {"strategy": "redact", "keep_start": 0, "keep_end": 4},
+     "id": "hash",
+     "name": "drop",
+     "email": "drop",
+     "phone": {"strategy": "redact", "char": "X", "keep_start": 0, "keep_end": 4},
      "region": "keep",
      "purchase_count": "keep"
    }
@@ -73,16 +73,16 @@ Inspect the result:
 
 .. code-block:: csv
 
-   name,email,phone,region,purchase_count
-   ****,d6d5d09f12b3f0f1a8a2c1e3b5e7d9f2,*****0101,US-CA,42
-   ****,5e6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e,*****0102,US-NY,15
-   ****,1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p,*****0103,US-TX,87
+    id,phone,region,purchase_count
+    6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b,XXXX0101,US-CA,42
+    d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35,XXXX0102,US-NY,15
+    4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce,XXXX0103,US-TX,87
 
 What happened:
 
-- **id**: Removed entirely (``drop``)
-- **name**: Completely redacted with ``*`` (``redact``)
-- **email**: Hashed (unreadable, but consistent for the same input)
+- **id**: Hashed (unreadable, but consistent for the same input)
+- **name**: Removed entirely (``drop``)
+- **email**: Removed entirely (``drop``)
 - **phone**: Last 4 digits kept, rest redacted (``keep_end: 4``)
 - **region** and **purchase_count**: Left unchanged (``keep``)
 
@@ -98,12 +98,12 @@ For developers building applications on top of MaskMe, use the Python API:
 
    # Define rules (same as the JSON file)
    rules = {
-       "id": "drop",
-       "name": "redact",
-       "email": "hash",
-       "phone": {"strategy": "redact", "keep_start": 0, "keep_end": 4},
+       "id": "hash",
+       "name": "drop",
+       "email": "drop",
+       "phone": {"strategy": "redact", "char": "X", "keep_start": 0, "keep_end": 4},
        "region": "keep",
-       "purchase_count": "keep",
+       "purchase_count": "keep"
    }
 
    # Load data
@@ -112,10 +112,10 @@ For developers building applications on top of MaskMe, use the Python API:
        records = list(reader)
 
    # Initialize engine
-   masker = MaskMe(rules)
+   engine = MaskMe(rules)
 
    # Process records
-   masked_records = list(masker.mask(records))
+   masked_records = list(engine.mask(records))
 
    # Save results
    with open("customers_masked.csv", "w") as f:
@@ -135,16 +135,16 @@ Strategy: Keep
 
 **Keeps the original value unchanged.**
 
-Use when: The field is already public, non-sensitive, or needed for analysis.
+Use when: The field is already public, non-sensitive, or represent key analytical dimensions.
 
 Example: Geographic region, product category, or timestamp.
 
 .. code-block:: python
 
-   from maskme.strategies import keep
+   from maskme.strategies import noop
 
    value = "US-CA"
-   result = keep.apply(value)
+   result = noop.apply(value)
    # result: "US-CA"
 
 Strategy: Drop
@@ -152,7 +152,9 @@ Strategy: Drop
 
 **Removes the field entirely.**
 
-Use when: The field is unnecessary and removing it reduces re-identification risk. IDs, internal references, or identifiers.
+Use when: The field is a direct identifier (PII) that could lead to re-identification, or if the field is unnecessary for the final dataset.
+
+Example: Names, email addresses, phone numbers, social security numbers.
 
 .. code-block:: python
 
@@ -169,7 +171,7 @@ Strategy: Hash
 
 Use when: You need a consistent, one-way transformation (cannot be reversed).
 
-Common use: Email addresses, usernames, customer IDs when consistency is important.
+Common use: Usernames, customer IDs when consistency is important.
 
 Parameters:
 
@@ -223,10 +225,11 @@ Parameters:
 
    # Keep last 4 digits (credit card pattern)
    result = redaction.apply(
-       "4532-1234-5678-9012",
+       "4532123456789012",
+       char="X",
        keep_end=4
    )
-   # result: "****-****-****-9012"
+   # result: "XXXXXXXXXXXX9012"
 
    # Keep first and last
    result = redaction.apply(
@@ -248,14 +251,14 @@ Common use: Purchase amounts, ages, salaries, temperatures.
 
 Two approaches:
 
-**Laplace Noise** (small adjustments):
+**Gaussian Noise** (simple noise control):
 
 .. code-block:: python
 
    from maskme.strategies import noise
 
-   # Add Laplace noise with fixed scale
-   result = noise.apply(42, scale=5)
+   # Add Gaussian noise with fixed sigma
+   result = noise.apply(42, sigma=5)
    # result: 38 (or another value near 42)
 
 **Differential Privacy (strong privacy guarantees)**:
@@ -265,15 +268,15 @@ Two approaches:
    # Use Gaussian mechanism for differential privacy
    result = noise.apply(
        42,
-       epsilon=0.5,    # Privacy budget (smaller = more private)
-       delta=1e-5,     # Probability of breach
-       sensitivity=10  # Max change when one person's data changes
+       epsilon=0.5,      # Privacy budget (smaller = more private)
+       sensitivity=10,   # Max change when one person's data changes
+       delta=1e-5        # Probability of breach (default)
    )
    # Adds noise calibrated to (ε, δ)-differential privacy
 
 **When to use each**:
 
-- **Laplace**: Simple, intuitive noise for exploratory analysis.
+- **Direct sigma**: Simple noise for exploratory analysis.
 - **Differential Privacy**: Strong, formal privacy guarantees (GDPR-friendly).
 
 Strategy: Generalization
@@ -292,32 +295,17 @@ Common use: Dates (year only), locations (state instead of city), ages (age grou
    # Generalize date to year
    result = generalization.apply(
        "2024-03-15",
-       method="date",
-       level="year"
+       method="date_year"
    )
    # result: "2024"
 
-   # Generalize age to bracket (you need to define your brackets)
+   # Generalize age to bracket with custom bins
    result = generalization.apply(
        28,
-       method="numeric_range",
-       ranges=[[0, 18], [18, 30], [30, 50], [50, 100]]
+       bins=[0, 18, 30, 50, 100],
+       method="range"
    )
-   # result: [18, 30]  (28 falls in this bracket)
-
-Strategy: No-op (Keep)
-~~~~~~~~~~~~~~~~~~~~~~
-
-**Does nothing — value passes through unchanged.**
-
-Use as: Default behavior or explicit "don't touch this" marker.
-
-.. code-block:: python
-
-   from maskme.strategies import noop
-
-   result = noop.apply("anything")
-   # result: "anything"
+   # result: "18-30"
 
 Choosing the Right Strategy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -334,65 +322,9 @@ Use this decision tree:
    ├─ Yes, and I don't need it → drop
    └─ Yes, and it's categorical → generalization
 
-Part 3: Analytics—Measuring Privacy
+Part 3: Measuring Privacy and Utility
 ====================================
 
-After anonymizing, you should verify the privacy-utility trade-off. MaskMe includes analytics to measure:
-
-- **K-anonymity**: How many records are indistinguishable
-- **L-diversity**: How diverse are quasi-identifiers
-- **T-closeness**: How close is the distribution to the original
-- **Information loss**: How much data utility is lost
-
-Running Analytics
-~~~~~~~~~~~~~~~~~
-
-.. code-block:: python
-
-   from maskme.analytics.metrics import kanonymity, linformationloss
-   from maskme.analytics.report import generate
-
-   # Original and masked datasets
-   original_records = [...]  # Your original data
-   masked_records = [...]    # Your masked data
-
-   # Compute K-anonymity
-   k = kanonymity.compute(
-       masked_records,
-       quasi_identifiers=["region", "purchase_count"]
-   )
-   print(f"K-anonymity: {k}")  # Higher is better (≥5 is good)
-
-   # Compute information loss
-   loss = linformationloss.compute(original_records, masked_records)
-   print(f"Information loss: {loss:.2%}")
-
-   # Generate HTML report
-   from maskme.analytics.report import generate
-
-   generate(
-       results=[...],  # AnalyticResult objects
-       output_path="privacy_report.html",
-       dataset_info={
-           "records": len(masked_records),
-           "source": "customers.csv"
-       }
-   )
-
-Understanding the Metrics
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**K-anonymity ≥ 5** (generally acceptable):
-   Each quasi-identifier combination appears at least 5 times. An attacker cannot narrow down an individual to fewer than 5 candidates.
-
-**L-diversity ≥ 2** (good):
-   For each quasi-identifier group, there are at least 2 diverse values in the sensitive attribute. Prevents attribute inference.
-
-**T-closeness < 0.1** (good):
-   Masked distribution is close to the original. Less statistical distortion.
-
-**Information loss < 20%** (good):
-   Most data utility is preserved.
 
 Part 4: Real-World Example
 ===========================
@@ -418,19 +350,17 @@ Let's put it all together with a realistic scenario:
      "patient_id": "drop",
      "age": {
        "strategy": "generalize",
-       "method": "numeric_range",
-       "ranges": [[0, 18], [18, 30], [30, 50], [50, 65], [65, 120]]
+       "step": 5,
+       "method": "range"
      },
      "postal_code": {
        "strategy": "generalize",
-       "method": "keep_prefix",
-       "prefix_length": 2
+       "depth": 2
      },
      "diagnosis": {"strategy": "hash", "salt": "healthcare-2026"},
      "visit_date": {
        "strategy": "generalize",
-       "method": "date",
-       "level": "year"
+       "method": "date_year"
      },
      "medication": "keep"
    }
@@ -441,31 +371,6 @@ Let's put it all together with a realistic scenario:
 
    maskme --rules healthcare_rules.json --input visits.csv --output visits_masked.csv
 
-**Measure privacy**:
-
-.. code-block:: python
-
-   from maskme.analytics.metrics import kanonymity
-
-   # Load original and masked data
-   import csv
-
-   with open("visits.csv") as f:
-       original = list(csv.DictReader(f))
-
-   with open("visits_masked.csv") as f:
-       masked = list(csv.DictReader(f))
-
-   # Check k-anonymity on quasi-identifiers
-   k = kanonymity.compute(
-       masked,
-       quasi_identifiers=["age", "postal_code", "visit_date"]
-   )
-
-   if k >= 5:
-       print(f"✓ Privacy OK: K-anonymity = {k}")
-   else:
-       print(f"✗ Privacy insufficient: K-anonymity = {k} (need ≥5)")
 
 Next Steps
 ==========

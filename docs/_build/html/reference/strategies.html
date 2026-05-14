@@ -272,7 +272,7 @@
 </section>
 <section id="noise">
 <h2>Noise</h2>
-<p><strong>Description</strong>: Adds statistical noise to numeric values.</p>
+<p><strong>Description</strong>: Adds Gaussian noise to numeric values.</p>
 <p><strong>When to use</strong>:
 - Numeric fields: ages, salaries, amounts, measurements
 - Preserve statistical distributions while hiding individual values
@@ -281,142 +281,192 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">apply</span><span class="p">(</span>
 </span><span id="line-2">    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 </span><span id="line-3">    <span class="n">sigma</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-4">    <span class="n">scale</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-5">    <span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-6">    <span class="n">delta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-7">    <span class="n">sensitivity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-8">    <span class="n">min_val</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-9">    <span class="n">max_val</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-10">    <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-4">    <span class="n">min_val</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-5">    <span class="n">max_val</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-6">    <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-7">    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-8">    <span class="n">epsilon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-9">    <span class="n">sensitivity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-10">    <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-5</span><span class="p">,</span>
 </span><span id="line-11">    <span class="o">**</span><span class="n">kwargs</span>
-</span><span id="line-12"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span>
+</span><span id="line-12"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 </span></code></pre></div>
 </div>
-<p><strong>Parameters (Laplace Noise)</strong>:</p>
+<p><strong>Parameters</strong>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">scale</span></code> (float): Laplace distribution scale parameter. Noise ~ Laplace(0, scale).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigma</span></code> (float): Standard deviation for direct Gaussian noise. Mutually exclusive with epsilon/sensitivity. Defaults to 1.0 if neither mode specified.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min_val</span></code> / <code class="docutils literal notranslate"><span class="pre">max_val</span></code> (float): Clipping bounds. Result clipped to [min_val, max_val].</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">precision</span></code> (int): Decimal places to round to (0 = return int).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seed</span></code> (Optional[Any]): Seed for reproducible noise generation. Combined with sigma and value for consistency.</p></li>
 </ul>
-<p><strong>Parameters (Differential Privacy — Gaussian)</strong>:</p>
+<p><strong>Differential Privacy Parameters</strong> (mutually exclusive with sigma):</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">epsilon</span></code> (float): Privacy budget. Smaller = more private. Must be &gt; 0.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">delta</span></code> (float): Probability of failure. Typically 1e-5. Must be in (0, 1).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sensitivity</span></code> (float): Maximum change in output when one individual’s data changes. Must be &gt; 0.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">epsilon</span></code> (float): Privacy budget ε. Smaller = stronger privacy. Must be &gt; 0. Requires sensitivity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sensitivity</span></code> (float): L2-sensitivity Δf (max output change per person). Must be &gt; 0. Requires epsilon.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">delta</span></code> (float): Probability of privacy breach δ. Must be in (0, 1). Defaults to 1e-5.</p></li>
 </ul>
-<p><strong>Optional Parameters (both modes)</strong>:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">min_val</span></code> / <code class="docutils literal notranslate"><span class="pre">max_val</span></code> (float): Clipping bounds. Result is clipped to [min_val, max_val].</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">precision</span></code> (int): Decimal places to round to (default: no rounding).</p></li>
-</ul>
-<p><strong>Returns</strong>: Noised value (float)</p>
-<p><strong>Behavior — Laplace Noise</strong>:</p>
+<p><strong>Returns</strong>: Noised numeric value (float or int if precision=0), or original value if non-numeric</p>
+<p><strong>Behavior — Direct Mode</strong> (using sigma):</p>
 <div class="math notranslate nohighlight">
-\[x' = x + \text{Laplace}(0, \text{scale})\]</div>
-<p>Each value gets independent random noise. Good for exploratory analysis.</p>
-<p><strong>Behavior — Differential Privacy (Gaussian)</strong>:</p>
+\[x' = x + \mathcal{N}(0, \sigma^2)\]</div>
+<p>Quick noise for exploratory analysis without formal privacy guarantees.</p>
+<p><strong>Behavior — Differential Privacy Mode</strong> (using epsilon + sensitivity):</p>
 <div class="math notranslate nohighlight">
 \[ \begin{align}\begin{aligned}\sigma = \text{sensitivity} \times \sqrt{2 \ln(1.25 / \delta)} / \epsilon\\x' = x + \mathcal{N}(0, \sigma^2)\end{aligned}\end{align} \]</div>
-<p>Noise calibrated to guarantee (ε, δ)-differential privacy.</p>
+<p>Guarantees (ε, δ)-differential privacy per Dwork &amp; Roth (2014).</p>
 <p><strong>Examples</strong>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">noise</span>
 </span><span id="line-2">
-</span><span id="line-3"><span class="c1"># Laplace noise (simple case)</span>
-</span><span id="line-4"><span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># → ~42 (varies each call)</span>
+</span><span id="line-3"><span class="c1"># Direct Gaussian noise (simple case)</span>
+</span><span id="line-4"><span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># → ~42 (varies each call)</span>
 </span><span id="line-5">
-</span><span id="line-6"><span class="c1"># Differential privacy (strong guarantee)</span>
-</span><span id="line-7"><span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-8">    <span class="mi">42</span><span class="p">,</span>
-</span><span id="line-9">    <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>      <span class="c1"># Moderate privacy</span>
-</span><span id="line-10">    <span class="n">delta</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>       <span class="c1"># 0.001% breach probability</span>
-</span><span id="line-11">    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">10</span>    <span class="c1"># Max change per person</span>
-</span><span id="line-12"><span class="p">)</span>
-</span><span id="line-13"><span class="c1"># → ~42 (calibrated noise)</span>
-</span><span id="line-14">
-</span><span id="line-15"><span class="c1"># Clipping + precision</span>
-</span><span id="line-16"><span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-17">    <span class="mi">28</span><span class="p">,</span>
-</span><span id="line-18">    <span class="n">scale</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-</span><span id="line-19">    <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-</span><span id="line-20">    <span class="n">max_val</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-</span><span id="line-21">    <span class="n">precision</span><span class="o">=</span><span class="mi">1</span>
-</span><span id="line-22"><span class="p">)</span>
-</span><span id="line-23"><span class="c1"># → 27.3 (noise applied, clipped, rounded to 1 decimal)</span>
+</span><span id="line-6"><span class="c1"># Reproducible noise with seed</span>
+</span><span id="line-7"><span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="s2">"my-seed"</span><span class="p">)</span>  <span class="c1"># Same seed = same noise</span>
+</span><span id="line-8">
+</span><span id="line-9"><span class="c1"># Differential privacy mode (strong guarantee)</span>
+</span><span id="line-10"><span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+</span><span id="line-11">    <span class="mi">42</span><span class="p">,</span>
+</span><span id="line-12">    <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>       <span class="c1"># Privacy budget</span>
+</span><span id="line-13">    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>    <span class="c1"># Max change per person</span>
+</span><span id="line-14">    <span class="n">delta</span><span class="o">=</span><span class="mf">1e-5</span>         <span class="c1"># 0.001% breach probability</span>
+</span><span id="line-15"><span class="p">)</span>
+</span><span id="line-16"><span class="c1"># → ~42 (calibrated noise with formal guarantee)</span>
+</span><span id="line-17">
+</span><span id="line-18"><span class="c1"># Clipping + rounding to integer</span>
+</span><span id="line-19"><span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+</span><span id="line-20">    <span class="mi">28</span><span class="p">,</span>
+</span><span id="line-21">    <span class="n">sigma</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+</span><span id="line-22">    <span class="n">min_val</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-23">    <span class="n">max_val</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+</span><span id="line-24">    <span class="n">precision</span><span class="o">=</span><span class="mi">0</span>
+</span><span id="line-25"><span class="p">)</span>
+</span><span id="line-26"><span class="c1"># → 27 (noise applied, clipped to [0,100], rounded to int)</span>
+</span><span id="line-27">
+</span><span id="line-28"><span class="c1"># Rounding to 2 decimals</span>
+</span><span id="line-29"><span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+</span><span id="line-30">    <span class="mf">28.5</span><span class="p">,</span>
+</span><span id="line-31">    <span class="n">sigma</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+</span><span id="line-32">    <span class="n">precision</span><span class="o">=</span><span class="mi">2</span>
+</span><span id="line-33"><span class="p">)</span>
+</span><span id="line-34"><span class="c1"># → 29.24</span>
 </span></code></pre></div>
 </div>
 <p><strong>Privacy guarantee</strong>:
-- <strong>Laplace</strong>: No formal guarantee (heuristic noise)
-- <strong>Differential Privacy</strong>: Formal (ε, δ)-DP guarantee (GDPR-friendly)</p>
-<p><strong>When to choose each</strong>:</p>
+- <strong>Direct sigma</strong>: No formal guarantee (heuristic noise)
+- <strong>Differential Privacy</strong> (epsilon + sensitivity): Formal (ε, δ)-DP guarantee (GDPR-friendly)</p>
+<p><strong>When to use each</strong>:</p>
 <ul class="simple">
-<li><p><strong>Laplace</strong>: Quick exploratory analysis, understood by analysts</p></li>
-<li><p><strong>Differential Privacy</strong>: Regulatory requirements, strong privacy guarantees needed</p></li>
+<li><p><strong>Direct sigma</strong>: Quick anonymization, exploratory analysis, understood by analysts</p></li>
+<li><p><strong>Differential Privacy</strong>: Regulatory requirements, formal privacy guarantees needed</p></li>
 </ul>
 </section>
 <section id="generalization">
 <h2>Generalization</h2>
 <p><strong>Description</strong>: Coarsens data to broader categories.</p>
 <p><strong>When to use</strong>:
-- Dates (2024-03-15 → 2024)
-- Locations (city → state)
-- Ages (28 → [25, 35])
+- Dates (2024-03-15 → 2024 or 2024-03)
+- Locations (city → state/region)
+- Ages (28 → 25-30 or 20-30 bracket)
 - Any hierarchical categorization</p>
 <p><strong>Signature</strong>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="n">apply</span><span class="p">(</span>
 </span><span id="line-2">    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-</span><span id="line-3">    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"keep_prefix"</span><span class="p">,</span>
-</span><span id="line-4">    <span class="n">level</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-5">    <span class="n">ranges</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-6">    <span class="n">prefix_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="line-7">    <span class="o">**</span><span class="n">kwargs</span>
-</span><span id="line-8"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</span><span id="line-3">    <span class="n">step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-4">    <span class="n">bins</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="line-5">    <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="line-6">    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"range"</span><span class="p">,</span>
+</span><span id="line-7">    <span class="n">default</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Others"</span><span class="p">,</span>
+</span><span id="line-8">    <span class="o">**</span><span class="n">kwargs</span>
+</span><span id="line-9"><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
 </span></code></pre></div>
 </div>
 <p><strong>Parameters</strong>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">method</span></code> (str): Generalization method. Supported: “date”, “numeric_range”, “keep_prefix”.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">level</span></code> (str): For date method. Options: “year”, “month”, “day”.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ranges</span></code> (List[List[float]]): For numeric_range. List of [min, max] boundaries.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">prefix_length</span></code> (int): For keep_prefix. Number of characters to keep.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">step</span></code> (Union[int, float]): Fixed step size for numeric values (e.g., 10 for age brackets). Mutually exclusive with bins.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bins</span></code> (List[float]): Custom boundary list for numeric values (e.g., [0, 18, 65]). Mutually exclusive with step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">depth</span></code> (int): For location strings (comma-separated). Number of leading parts to drop (default: 1).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">method</span></code> (str): Generalization strategy:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">"range"</span></code>: Numeric interval (e.g., “20-30”) — default for numeric</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"floor"</span></code>: Numeric floor only (e.g., “20”)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"date_year"</span></code>: Year only (e.g., “2024”)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">"date_month"</span></code>: Year and month (e.g., “2024-03”)</p></li>
 </ul>
-<p><strong>Examples — Date Generalization</strong>:</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">default</span></code> (str): Fallback value when generalization fails (default: “Others”).</p></li>
+</ul>
+<p><strong>Returns</strong>: Generalized string, or None if input is None</p>
+<p><strong>Behavior — Numeric with step</strong>:</p>
+<p>Step divides numeric values into fixed intervals.</p>
+<p><strong>Examples — Numeric Generalization</strong>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">generalization</span>
 </span><span id="line-2">
-</span><span id="line-3"><span class="c1"># Year only</span>
-</span><span id="line-4"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"2024-03-15"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"date"</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">"year"</span><span class="p">)</span>
-</span><span id="line-5"><span class="c1"># → "2024"</span>
+</span><span id="line-3"><span class="c1"># Age bracket with step=10</span>
+</span><span id="line-4"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">27</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"range"</span><span class="p">)</span>
+</span><span id="line-5"><span class="c1"># → "20-30"</span>
 </span><span id="line-6">
-</span><span id="line-7"><span class="c1"># Year and month</span>
-</span><span id="line-8"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"2024-03-15"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"date"</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">"month"</span><span class="p">)</span>
-</span><span id="line-9"><span class="c1"># → "2024-03"</span>
-</span><span id="line-10">
-</span><span id="line-11"><span class="c1"># Full date (no generalization)</span>
-</span><span id="line-12"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"2024-03-15"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"date"</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">"day"</span><span class="p">)</span>
-</span><span id="line-13"><span class="c1"># → "2024-03-15"</span>
+</span><span id="line-7"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">27</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"floor"</span><span class="p">)</span>
+</span><span id="line-8"><span class="c1"># → "20"</span>
+</span><span id="line-9">
+</span><span id="line-10"><span class="c1"># Custom age brackets with bins</span>
+</span><span id="line-11"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">27</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">"range"</span><span class="p">)</span>
+</span><span id="line-12"><span class="c1"># → "18-30"</span>
+</span><span id="line-13">
+</span><span id="line-14"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">"range"</span><span class="p">)</span>
+</span><span id="line-15"><span class="c1"># → "0-18"</span>
+</span><span id="line-16">
+</span><span id="line-17"><span class="c1"># Out of range</span>
+</span><span id="line-18"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">"range"</span><span class="p">)</span>
+</span><span id="line-19"><span class="c1"># → "&lt;18"</span>
+</span><span id="line-20">
+</span><span id="line-21"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">85</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">65</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="s2">"range"</span><span class="p">)</span>
+</span><span id="line-22"><span class="c1"># → "&gt;=65"</span>
 </span></code></pre></div>
 </div>
-<p><strong>Examples — Numeric Range</strong>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="c1"># Age brackets</span>
-</span><span id="line-2"><span class="n">ranges</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">18</span><span class="p">],</span> <span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">30</span><span class="p">],</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">]]</span>
-</span><span id="line-3">
-</span><span id="line-4"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"numeric_range"</span><span class="p">,</span> <span class="n">ranges</span><span class="o">=</span><span class="n">ranges</span><span class="p">)</span>
-</span><span id="line-5"><span class="c1"># → [0, 18]</span>
-</span><span id="line-6">
-</span><span id="line-7"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"numeric_range"</span><span class="p">,</span> <span class="n">ranges</span><span class="o">=</span><span class="n">ranges</span><span class="p">)</span>
-</span><span id="line-8"><span class="c1"># → [18, 30]</span>
-</span></code></pre></div>
-</div>
-<p><strong>Examples — Prefix Keeping</strong>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="c1"># Keep first 2 chars (postal code)</span>
-</span><span id="line-2"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"12345"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"keep_prefix"</span><span class="p">,</span> <span class="n">prefix_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</span><span id="line-3"><span class="c1"># → "12"</span>
+<p><strong>Behavior — Date Generalization</strong>:</p>
+<p>Reduces date precision to year or year+month.</p>
+<p><strong>Examples — Date Generalization</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="c1"># Year only</span>
+</span><span id="line-2"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"2024-03-15"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"date_year"</span><span class="p">)</span>
+</span><span id="line-3"><span class="c1"># → "2024"</span>
 </span><span id="line-4">
-</span><span id="line-5"><span class="c1"># Keep first 5 chars (ZIP+4)</span>
-</span><span id="line-6"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"12345-6789"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"keep_prefix"</span><span class="p">,</span> <span class="n">prefix_length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-</span><span id="line-7"><span class="c1"># → "12345"</span>
+</span><span id="line-5"><span class="c1"># Year and month</span>
+</span><span id="line-6"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"2024-03-15"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"date_month"</span><span class="p">)</span>
+</span><span id="line-7"><span class="c1"># → "2024-03"</span>
+</span><span id="line-8">
+</span><span id="line-9"><span class="c1"># Also works with datetime objects</span>
+</span><span id="line-10"><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+</span><span id="line-11"><span class="n">dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+</span><span id="line-12"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"date_year"</span><span class="p">)</span>
+</span><span id="line-13"><span class="c1"># → "2024"</span>
+</span></code></pre></div>
+</div>
+<p><strong>Behavior — Location Generalization</strong>:</p>
+<p>Removes leading parts from comma-separated location strings (most specific → less specific).</p>
+<p><strong>Examples — Location Generalization</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="c1"># Remove 1 part (city → region)</span>
+</span><span id="line-2"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"Ouagadougou, Kadiogo, Centre"</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="line-3"><span class="c1"># → "Kadiogo, Centre"</span>
+</span><span id="line-4">
+</span><span id="line-5"><span class="c1"># Remove 2 parts (city+region → country)</span>
+</span><span id="line-6"><span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"Ouagadougou, Kadiogo, Centre"</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="line-7"><span class="c1"># → "Centre"</span>
 </span></code></pre></div>
 </div>
 <p><strong>Privacy guarantee</strong>: K-anonymity-like (groups become indistinguishable)</p>
 <p><strong>Utility trade-off</strong>: Coarsening reduces utility but preserves categorical/aggregate analysis</p>
-<p><strong>Note</strong>: Generalization is often combined with other strategies (e.g., hash + generalize) for multi-layered privacy.</p>
+<p><strong>Common patterns</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="c1"># Healthcare: age + year generalization</span>
+</span><span id="line-2"><span class="s2">"age"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"strategy"</span><span class="p">:</span> <span class="s2">"generalize"</span><span class="p">,</span> <span class="s2">"step"</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"range"</span><span class="p">},</span>
+</span><span id="line-3"><span class="s2">"visit_date"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"strategy"</span><span class="p">:</span> <span class="s2">"generalize"</span><span class="p">,</span> <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"date_year"</span><span class="p">},</span>
+</span><span id="line-4">
+</span><span id="line-5"><span class="c1"># E-Commerce: postal code simplification</span>
+</span><span id="line-6"><span class="s2">"postal_code"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"strategy"</span><span class="p">:</span> <span class="s2">"generalize"</span><span class="p">,</span> <span class="s2">"bins"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">20000</span><span class="p">,</span> <span class="mi">30000</span><span class="p">,</span> <span class="mi">100000</span><span class="p">],</span> <span class="s2">"method"</span><span class="p">:</span> <span class="s2">"floor"</span><span class="p">},</span>
+</span><span id="line-7">
+</span><span id="line-8"><span class="c1"># Public health: location generalization</span>
+</span><span id="line-9"><span class="s2">"location"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"strategy"</span><span class="p">:</span> <span class="s2">"generalize"</span><span class="p">,</span> <span class="s2">"depth"</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+</span></code></pre></div>
+</div>
 </section>
 <section id="no-op">
 <h2>No-op</h2>
