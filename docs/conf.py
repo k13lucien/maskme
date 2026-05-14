@@ -16,24 +16,23 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx_copybutton',
+    'sphinxawesome_theme',
 ]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Options for HTML output -------------------------------------------------
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinxawesome_theme'
 html_title = "MaskMe"
 html_static_path = ['_static']
 
-# Configuration for ReadTheDocs theme
-html_theme_options = {
-    'navigation_depth': 4,
-    'collapse_navigation': False,
-    'sticky_navigation': True,
-    'includehidden': True,
-    'titles_only': False
-}
+# Désactiver les marqueurs de liens permanents (¶)
+html_permalinks = False
+
+# Configuration de la coloration syntaxique
+pygments_style = 'sphinx'
+highlight_language = 'python3'
 
 # -- MyST Parser configuration -----------------------------------------------
 myst_enable_extensions = [
