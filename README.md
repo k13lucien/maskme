@@ -1,6 +1,16 @@
 <p align="center">
-  <img src="banner.png" />
+  <img src="banner.png" /><br>
+  <strong>The Open Data Framework for privacy compliance</strong>
 </p>
+
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=flat-square&logo=python)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+[![Documentation](https://img.shields.io/badge/Docs-ReadTheDocs-blue?style=flat-square&logo=readthedocs)](https://maskme.readthedocs.io/en/latest/)
+[![Website](https://img.shields.io/badge/Website-k13lucien.github.io%2Fmaskme-2997ff?style=flat-square)](https://k13lucien.github.io/maskme)
+
+</div>
 
 ---
 
