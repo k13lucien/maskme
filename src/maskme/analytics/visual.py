@@ -37,13 +37,13 @@ from typing import Any
 # Design tokens — import these in analytic modules for visual consistency
 # ---------------------------------------------------------------------------
 
-COLOR_SAFE      = "#4E9A4E"   # green  — satisfies threshold
-COLOR_RISK      = "#D9534F"   # red    — violates threshold
-COLOR_THRESHOLD = "#E08C1A"   # amber  — threshold marker
-COLOR_GRID      = "#E5E7EB"   # light gray
-COLOR_AXIS      = "#6B7280"   # medium gray
-COLOR_TEXT      = "#1F2937"   # near-black
-COLOR_SUBTEXT   = "#6B7280"
+COLOR_SAFE      = "#4A7A2C"   # olive    — satisfies threshold
+COLOR_RISK      = "#C44536"   # warm red — violates threshold
+COLOR_THRESHOLD = "#C4942A"   # amber    — threshold marker
+COLOR_GRID      = "#E8E4C8"   # cream-tinted grid
+COLOR_AXIS      = "#8B8B7A"   # muted olive-gray
+COLOR_TEXT      = "#2E2E2E"   # near-black
+COLOR_SUBTEXT   = "#8B8B7A"
 COLOR_BG        = "#FFFFFF"
 
 _FONT = "font-family=\"-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif\""
