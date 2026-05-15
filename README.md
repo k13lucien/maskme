@@ -283,6 +283,16 @@ Implement the `Analytic` / `Metric` Protocol in a new file under `analytics/metr
 
 ---
 
+## Contributors
+
+Thanks to everyone who contributes to MaskMe.
+
+<a href="https://github.com/k13lucien/maskme/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=k13lucien/maskme" alt="Contributors to k13lucien/maskme" />
+</a>
+
+---
+
 ## Citation
 
 If you use MaskMe in your research, please cite it as:
