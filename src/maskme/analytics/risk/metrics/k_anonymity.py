@@ -1,5 +1,5 @@
 """
-maskme.analytics.metrics.k_anonymity
+maskme.analytics.risk.metrics.k_anonymity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 k-anonymity risk metric.
 
@@ -27,8 +27,8 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any, Dict, List, Tuple
 
-from maskme.analytics.base import Analytic, AnalyticResult
-from maskme.analytics.metrics._utils import build_equivalence_classes
+from maskme.analytics.risk.metrics.base import Metric, RiskResult
+from maskme.analytics.risk.metrics._utils import build_equivalence_classes
 from maskme.analytics import visual as v
 
 
@@ -60,7 +60,7 @@ class KAnonymity:
         quasi_identifiers: List[str],
         k_threshold: int = 2,
         **kwargs: Any,
-    ) -> AnalyticResult:
+    ) -> RiskResult:
         """
         Evaluate k-anonymity over a dataset.
 
@@ -71,10 +71,10 @@ class KAnonymity:
             k_threshold:       Minimum acceptable equivalence class size.
                                The dataset passes if k_min >= k_threshold.
                                Defaults to 2.
-            **kwargs:          Ignored (forwarded by the analytics runner).
+            **kwargs:          Ignored (forwarded by the metrics runner).
 
         Returns:
-            AnalyticResult with k-anonymity metrics and per-class details.
+            RiskResult with k-anonymity metrics and per-class details.
 
         Raises:
             ValueError: If records is empty or quasi_identifiers is empty.
@@ -137,7 +137,7 @@ class KAnonymity:
             "size_distribution": size_dist,
         }
 
-        return AnalyticResult(
+        return RiskResult(
             name=self.name,
             passed=passed,
             summary=summary,

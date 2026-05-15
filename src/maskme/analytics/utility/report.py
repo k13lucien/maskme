@@ -17,7 +17,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from maskme.utility.base import UtilityResult
+from maskme.analytics.utility.metrics.base import UtilityResult
 
 
 def generate(

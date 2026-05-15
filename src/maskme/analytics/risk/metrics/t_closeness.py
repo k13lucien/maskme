@@ -1,5 +1,5 @@
 """
-maskme.analytics.metrics.t_closeness
+maskme.analytics.risk.metrics.t_closeness
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 t-closeness risk metric.
 
@@ -47,8 +47,8 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any, Dict, List, Optional, Tuple
 
-from maskme.analytics.base import Analytic, AnalyticResult
-from maskme.analytics.metrics._utils import build_equivalence_classes
+from maskme.analytics.risk.metrics.base import Metric, RiskResult
+from maskme.analytics.risk.metrics._utils import build_equivalence_classes
 from maskme.analytics import visual as v
 
 
@@ -182,7 +182,7 @@ class TCloseness:
         sensitive_attr: str,
         t_threshold: float = 0.2,
         **kwargs: Any,
-    ) -> AnalyticResult:
+    ) -> RiskResult:
         """
         Evaluate t-closeness over a dataset.
 
@@ -193,10 +193,10 @@ class TCloseness:
                                distance on (e.g. "salary", "diagnosis").
             t_threshold:       Maximum acceptable EMD per equivalence class.
                                Defaults to 0.2 (a common practical value).
-            **kwargs:          Ignored (forwarded by the analytics runner).
+            **kwargs:          Ignored (forwarded by the metrics runner).
 
         Returns:
-            AnalyticResult with t-closeness metrics and per-class details.
+            RiskResult with t-closeness metrics and per-class details.
 
         Raises:
             ValueError: If records is empty, quasi_identifiers is empty,
@@ -288,7 +288,7 @@ class TCloseness:
             at_risk_classes, pct_at_risk, sensitive_attr,
         )
 
-        return AnalyticResult(
+        return RiskResult(
             name=self.name,
             passed=passed,
             summary=summary,

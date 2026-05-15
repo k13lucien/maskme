@@ -1,5 +1,5 @@
 """
-maskme.analytics.metrics.l_diversity
+maskme.analytics.risk.metrics.l_diversity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 l-diversity risk metric.
 
@@ -38,8 +38,8 @@ from __future__ import annotations
 from collections import Counter
 from typing import Any, Dict, List, Tuple
 
-from maskme.analytics.base import Analytic, AnalyticResult
-from maskme.analytics.metrics._utils import build_equivalence_classes
+from maskme.analytics.risk.metrics.base import Metric, RiskResult
+from maskme.analytics.risk.metrics._utils import build_equivalence_classes
 from maskme.analytics import visual as v
 
 
@@ -60,7 +60,7 @@ class LDiversity:
         sensitive_attr: str,
         l_threshold: int = 2,
         **kwargs: Any,
-    ) -> AnalyticResult:
+    ) -> RiskResult:
         """
         Evaluate distinct l-diversity over a dataset.
 
@@ -72,10 +72,10 @@ class LDiversity:
             l_threshold:       Minimum number of distinct sensitive values
                                required per equivalence class.
                                Defaults to 2.
-            **kwargs:          Ignored (forwarded by the analytics runner).
+            **kwargs:          Ignored (forwarded by the metrics runner).
 
         Returns:
-            AnalyticResult with l-diversity metrics and per-class details.
+            RiskResult with l-diversity metrics and per-class details.
 
         Raises:
             ValueError: If records is empty, quasi_identifiers is empty,
@@ -150,7 +150,7 @@ class LDiversity:
             at_risk_classes, sensitive_attr,
         )
 
-        return AnalyticResult(
+        return RiskResult(
             name=self.name,
             passed=passed,
             summary=summary,

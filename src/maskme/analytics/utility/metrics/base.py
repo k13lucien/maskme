@@ -14,9 +14,9 @@ Two building blocks:
                     with the correct signatures — no inheritance needed.
 
 Adding a new metric (e.g. ML-utility):
-    1. Create  utility/metrics/ml_utility.py
+    1. Create  analytics/utility/metrics/ml_utility.py
     2. Implement a class that satisfies the Metric Protocol
-    3. Register it in utility/__init__.py under METRICS
+    3. Register it in analytics/utility/__init__.py under METRICS
     → run(), report.py adapt automatically.
 """
 

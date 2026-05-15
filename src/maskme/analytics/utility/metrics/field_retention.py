@@ -1,5 +1,5 @@
 """
-maskme.utility.metrics.field_retention
+maskme.analytics.utility.metrics.field_retention
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Field Retention metric.
 
@@ -23,8 +23,8 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 from maskme.analytics import visual as v
-from maskme.utility.base import Metric, UtilityResult
-from maskme.utility.metrics._utils import (
+from maskme.analytics.utility.metrics.base import Metric, UtilityResult
+from maskme.analytics.utility.metrics._utils import (
     all_fields,
     paired_values,
     validate_alignment,

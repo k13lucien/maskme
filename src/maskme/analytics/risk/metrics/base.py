@@ -1,22 +1,22 @@
 """
-maskme.analytics.base
+maskme.analytics.risk.base
 ~~~~~~~~~~~~~~~~~~~~~~
-Formal contracts for the analytics layer.
+Formal contracts for the re-identification risk layer.
 
 Two building blocks:
 
-    AnalyticResult — a standardised dataclass that every analytic returns.
+    RiskResult — a standardised dataclass that every risk metric returns.
                      report.py and visual.py work exclusively with this
-                     type, making them agnostic to any specific analytic.
+                     type, making them agnostic to any specific metric.
 
-    Analytic       — a Protocol that every metric module must satisfy.
+    Metric       — a Protocol that every metric module must satisfy.
                      Structural subtyping: no inheritance needed, just
                      implement compute() with the correct signature.
 
-Adding a new analytic (e.g. delta-presence):
-    1. Create  analytics/metrics/delta_presence.py
-    2. Implement a class that satisfies the Analytic Protocol
-    3. Register it in analytics/__init__.py under ANALYTICS
+Adding a new metric (e.g. delta-presence):
+    1. Create  analytics/risk/metrics/delta_presence.py
+    2. Implement a class that satisfies the Metric Protocol
+    3. Register it in analytics/risk/__init__.py under METRICS
     → report.py and visual.py adapt automatically.
 """
 
@@ -31,17 +31,17 @@ from typing import Any, Dict, List, Protocol, runtime_checkable
 # ---------------------------------------------------------------------------
 
 @dataclass
-class AnalyticResult:
+class RiskResult:
     """
-    Standardised output produced by every analytic.
+    Standardised output produced by every metric.
 
     report.py and visual.py consume only this type — they have no
     knowledge of k-anonymity, l-diversity, or any other specific model.
 
     Attributes:
-        name:            Human-readable name of the analytic
+        name:            Human-readable name of the metric
                          (e.g. "k-Anonymity").
-        passed:          True if the dataset satisfies the analytic's
+        passed:          True if the dataset satisfies the metric's
                          threshold; False otherwise.
         summary:         Top-level scalar metrics for the summary section
                          of the report (e.g. {"k_min": 3, "at_risk": 12}).
@@ -69,34 +69,34 @@ class AnalyticResult:
 
 
 # ---------------------------------------------------------------------------
-# Analytic Protocol
+# Metric Protocol
 # ---------------------------------------------------------------------------
 
 @runtime_checkable
-class Analytic(Protocol):
+class Metric(Protocol):
     """
-    Protocol that every analytics module must satisfy.
+    Protocol that every Risk metric module must satisfy.
 
     Only one method is required: compute(). It receives the anonymised
-    records and keyword arguments specific to the analytic (quasi-
+    records and keyword arguments specific to the metric (quasi-
     identifiers, sensitive attribute, thresholds, etc.) and returns a
-    fully populated AnalyticResult.
+    fully populated RiskResult.
 
     The name class attribute is used by the registry and the report
     generator as a stable identifier.
 
     Example implementation skeleton:
 
-        class MyAnalytic:
-            name = "My Analytic"
+        class MyMetric:
+            name = "My Metric"
 
             def compute(
                 self,
                 records: List[Dict[str, Any]],
                 **kwargs,
-            ) -> AnalyticResult:
+            ) -> RiskResult:
                 ...
-                return AnalyticResult(
+                return RiskResult(
                     name=self.name,
                     passed=...,
                     summary={...},
@@ -112,13 +112,13 @@ class Analytic(Protocol):
         self,
         records: List[Dict[str, Any]],
         **kwargs: Any,
-    ) -> AnalyticResult:
+    ) -> RiskResult:
         """
-        Run the analytic against a list of records.
+        Run the metric against a list of records.
 
         Args:
             records:  The anonymised dataset as a list of dicts.
-            **kwargs: Analytic-specific parameters, e.g.:
+            **kwargs: Metric-specific parameters, e.g.:
                       - quasi_identifiers: List[str]
                       - sensitive_attr:    str
                       - k_threshold:       int
@@ -126,19 +126,19 @@ class Analytic(Protocol):
                       - t_threshold:       float
 
         Returns:
-            A fully populated AnalyticResult.
+            A fully populated RiskResult.
         """
         ...
 
     def chart(self, summary: Dict[str, Any]) -> List[str]:
         """
-        Generate SVG charts for the analytic's results.
+        Generate SVG charts for the metric's results.
 
-        Each analytic is responsible for its own visualisations.
-        visual.py provides SVG primitives; the analytic assembles them.
+        Each metric is responsible for its own visualisations.
+        visual.py provides SVG primitives; the metric assembles them.
 
         Args:
-            summary: The summary dict from a computed AnalyticResult.
+            summary: The summary dict from a computed RiskResult.
 
         Returns:
             A list of self-contained SVG strings to embed in the report.

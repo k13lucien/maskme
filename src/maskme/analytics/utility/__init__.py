@@ -31,10 +31,11 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from maskme.utility.base import Metric, UtilityResult
-from maskme.utility.metrics.field_retention import FieldRetention
-from maskme.utility.metrics.information_loss import InformationLoss
-from maskme.utility.metrics.statistical_fidelity import StatisticalFidelity
+from . import report
+from maskme.analytics.utility.metrics.base import Metric, UtilityResult
+from maskme.analytics.utility.metrics.field_retention import FieldRetention
+from maskme.analytics.utility.metrics.information_loss import InformationLoss
+from maskme.analytics.utility.metrics.statistical_fidelity import StatisticalFidelity
 
 # ---------------------------------------------------------------------------
 # Registry — single source of truth for available utility metrics.
@@ -128,4 +129,4 @@ def run(
     return results
 
 
-__all__ = ["METRICS", "run", "UtilityResult", "Metric"]
+__all__ = ["METRICS", "run", "report", "UtilityResult", "Metric"]

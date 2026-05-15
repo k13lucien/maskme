@@ -1,5 +1,5 @@
 """
-maskme.utility.metrics.statistical_fidelity
+maskme.analytics.utility.metrics.statistical_fidelity
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Statistical Fidelity metric.
 
@@ -31,8 +31,8 @@ from collections import Counter
 from typing import Any, Dict, List, Optional, Tuple
 
 from maskme.analytics import visual as v
-from maskme.utility.base import Metric, UtilityResult
-from maskme.utility.metrics._utils import (
+from maskme.analytics.utility.metrics.base import Metric, UtilityResult
+from maskme.analytics.utility.metrics._utils import (
     classify_fields,
     paired_values,
     safe_float,

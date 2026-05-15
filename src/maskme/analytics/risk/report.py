@@ -1,10 +1,10 @@
 """
-maskme.analytics.report
-~~~~~~~~~~~~~~~~~~~~~~~~
+maskme.analytics.risk.report
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 HTML report generator for re-identification risk analytics.
 
-This module is fully agnostic to specific analytics — it works exclusively
-with AnalyticResult objects. Adding a new analytic never requires changes
+This module is fully agnostic to specific risk metrics — it works exclusively
+with RiskResult objects. Adding a new risk metric never requires changes
 here.
 
 Public API:
@@ -18,7 +18,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from maskme.analytics.base import AnalyticResult
+from maskme.analytics.risk.metrics.base import RiskResult
 
 
 # ---------------------------------------------------------------------------
@@ -26,18 +26,18 @@ from maskme.analytics.base import AnalyticResult
 # ---------------------------------------------------------------------------
 
 def generate(
-    results: List[AnalyticResult],
+    results: List[RiskResult],
     output_path: str,
     dataset_info: Optional[Dict[str, Any]] = None,
 ) -> None:
     """
     Generate a self-contained HTML risk report and write it to disk.
 
-    Iterates over AnalyticResult objects — no knowledge of k-anonymity,
-    l-diversity, or any specific analytic is required.
+    Iterates over RiskResult objects — no knowledge of k-anonymity,
+    l-diversity, or any specific risk metric is required.
 
     Args:
-        results:      List of computed AnalyticResult instances.
+        results:      List of computed RiskResult instances.
                       Charts must already be populated (result.charts).
         output_path:  Destination path for the HTML file.
         dataset_info: Optional metadata to display in the header section
@@ -52,7 +52,7 @@ def generate(
 # ---------------------------------------------------------------------------
 
 def _build_document(
-    results: List[AnalyticResult],
+    results: List[RiskResult],
     dataset_info: Dict[str, Any],
 ) -> str:
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -124,16 +124,16 @@ def _build_document(
 # ---------------------------------------------------------------------------
 
 def _summary_section(
-    results: List[AnalyticResult],
+    results: List[RiskResult],
     dataset_info: Dict[str, Any],
     overall_pass: bool,
 ) -> str:
     verdict_cls = "verdict-pass" if overall_pass else "verdict-fail"
     verdict_msg = (
-        "All analytics passed. The dataset meets the configured "
+        "All risk metrics passed. The dataset meets the configured "
         "re-identification risk thresholds."
         if overall_pass else
-        "One or more analytics failed. Review the sections below and "
+        "One or more risk metrics failed. Review the sections below and "
         "apply the recommended mitigations before publishing this dataset."
     )
 
@@ -174,7 +174,7 @@ def _summary_section(
 # Per-analytic section
 # ---------------------------------------------------------------------------
 
-def _section(result: AnalyticResult) -> str:
+def _section(result: RiskResult) -> str:
     passed_cls = "badge-pass" if result.passed else "badge-fail"
     passed_txt = "PASSED" if result.passed else "FAILED"
 
@@ -268,7 +268,7 @@ def _details_table(details: List[Dict[str, Any]]) -> str:
 # Consolidated recommendations
 # ---------------------------------------------------------------------------
 
-def _recommendations_section(results: List[AnalyticResult]) -> str:
+def _recommendations_section(results: List[RiskResult]) -> str:
     items = ""
     for result in results:
         if not result.recommendations:

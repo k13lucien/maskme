@@ -1,6 +1,6 @@
 """
-maskme.analytics.metrics._utils
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+maskme.analytics.risk.metrics._utils
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Shared utilities for the analytics metrics layer.
 
 Centralises equivalence-class construction so that k-anonymity,

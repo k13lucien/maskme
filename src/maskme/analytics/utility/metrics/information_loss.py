@@ -1,5 +1,5 @@
 """
-maskme.utility.metrics.information_loss
+maskme.analytics.utility.metrics.information_loss
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Information Loss Index (ILI) metric.
 
@@ -48,8 +48,8 @@ import math
 from typing import Any, Dict, List, Optional
 
 from maskme.analytics import visual as v
-from maskme.utility.base import Metric, UtilityResult
-from maskme.utility.metrics._utils import (
+from maskme.analytics.utility.metrics.base import Metric, UtilityResult
+from maskme.analytics.utility.metrics._utils import (
     all_fields,
     classify_fields,
     paired_values,
