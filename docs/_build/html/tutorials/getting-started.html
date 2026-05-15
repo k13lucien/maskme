@@ -222,141 +222,424 @@
 <p><strong>Keeps the original value unchanged.</strong></p>
 <p>Use when: The field is already public, non-sensitive, or represent key analytical dimensions.</p>
 <p>Example: Geographic region, product category, or timestamp.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">noop</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="n">value</span> <span class="o">=</span> <span class="s2">"US-CA"</span>
-</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">noop</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-</span><span id="line-5"><span class="c1"># result: "US-CA"</span>
+<p>In rules file:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keep"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"category"</span><span class="p">:</span><span class="w"> </span><span class="s2">"keep"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Input data:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"US-West"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"category"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Electronics"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Output data:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"US-West"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"category"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Electronics"</span>
+</span><span id="line-4"><span class="p">}</span>
 </span></code></pre></div>
 </div>
 <p><strong>Removes the field entirely.</strong></p>
 <p>Use when: The field is a direct identifier (PII) that could lead to re-identification, or if the field is unnecessary for the final dataset.</p>
 <p>Example: Names, email addresses, phone numbers, social security numbers.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">drop</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="n">value</span> <span class="o">=</span> <span class="mi">12345</span>
-</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">drop</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-</span><span id="line-5"><span class="c1"># result: "__DROP__"  (signals the engine to remove this field)</span>
+<p>In rules file:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"user_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"drop"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"internal_ref"</span><span class="p">:</span><span class="w"> </span><span class="s2">"drop"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Input data:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"user_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USR-12345"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"internal_ref"</span><span class="p">:</span><span class="w"> </span><span class="s2">"REF-999"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"john@example.com"</span>
+</span><span id="line-5"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Output data:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"john@example.com"</span>
+</span><span id="line-3"><span class="p">}</span>
 </span></code></pre></div>
 </div>
 <p><strong>Converts the value into a fixed-length hexadecimal digest.</strong></p>
 <p>Use when: You need a consistent, one-way transformation (cannot be reversed).</p>
-<p>Common use: Usernames, customer IDs when consistency is important.</p>
-<p>Parameters:</p>
+<p>Common use: Email addresses, usernames, customer IDs when consistency matters for record linking.</p>
+<p><strong>Parameters:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">algo</span></code>: Hashing algorithm (default: <code class="docutils literal notranslate"><span class="pre">sha256</span></code>). Can be <code class="docutils literal notranslate"><span class="pre">sha512</span></code>, <code class="docutils literal notranslate"><span class="pre">blake2b</span></code>, etc.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">salt</span></code>: Optional string mixed into the hash for extra security.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">algo</span></code>: Hashing algorithm — <code class="docutils literal notranslate"><span class="pre">sha256</span></code> (default), <code class="docutils literal notranslate"><span class="pre">sha512</span></code>, <code class="docutils literal notranslate"><span class="pre">blake2b</span></code>, etc.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">salt</span></code>: Recommended. Salt string for extra security. Same input + same salt = same output.</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">hashing</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="c1"># Basic hash</span>
-</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">hashing</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"alice@example.com"</span><span class="p">)</span>
-</span><span id="line-5"><span class="c1"># result: "d6d5d09f12b3f0f1a8a2c1e3b5e7d9f2"</span>
-</span><span id="line-6">
-</span><span id="line-7"><span class="c1"># Hash with algorithm</span>
-</span><span id="line-8"><span class="n">result</span> <span class="o">=</span> <span class="n">hashing</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-9">    <span class="s2">"alice@example.com"</span><span class="p">,</span>
-</span><span id="line-10">    <span class="n">algo</span><span class="o">=</span><span class="s2">"sha512"</span>
-</span><span id="line-11"><span class="p">)</span>
-</span><span id="line-12">
-</span><span id="line-13"><span class="c1"># Hash with salt (recommended for production)</span>
-</span><span id="line-14"><span class="n">result</span> <span class="o">=</span> <span class="n">hashing</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-15">    <span class="s2">"alice@example.com"</span><span class="p">,</span>
-</span><span id="line-16">    <span class="n">salt</span><span class="o">=</span><span class="s2">"my-secret-key-2026"</span>
-</span><span id="line-17"><span class="p">)</span>
+<p><strong>In rules file:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hash"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"customer_id"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hash"</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">    </span><span class="nt">"salt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my-org-secret-2026"</span>
+</span><span id="line-6"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-7"><span class="w">  </span><span class="nt">"diagnosis_code"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-8"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"hash"</span><span class="p">,</span>
+</span><span id="line-9"><span class="w">    </span><span class="nt">"algo"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sha512"</span><span class="p">,</span>
+</span><span id="line-10"><span class="w">    </span><span class="nt">"salt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"healthcare-key"</span>
+</span><span id="line-11"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-12"><span class="p">}</span>
 </span></code></pre></div>
 </div>
-<p><strong>Important</strong>: Same input + same salt = same output (useful for linking records), but different salt = different hash.</p>
+<p><strong>Input data:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alice@example.com"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"customer_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CUST-5678"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">  </span><span class="nt">"diagnosis_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"E11.9"</span>
+</span><span id="line-5"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Output data:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2a7f8e9c3b1d5f4a6e8c9b1d3f5a7e8c"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"customer_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"f4d8b7a9c1e3f5d9b2a4c6e8f1a3d5b7"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">  </span><span class="nt">"diagnosis_code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4ca1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"</span>
+</span><span id="line-5"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Same input + same salt = same output. This is useful for linking records across datasets.</p>
+</div>
 <p><strong>Replaces characters with a placeholder, preserving length.</strong></p>
-<p>Use when: You need to keep some information (partial numbers, patterns) while hiding the rest.</p>
-<p>Common use: Phone numbers, credit card numbers, postal codes.</p>
-<p>Parameters:</p>
+<p>Use when: You need some visible information (like last 4 digits) while hiding the rest.</p>
+<p>Common use: Phone numbers, credit cards, partially-visible IDs.</p>
+<p><strong>Parameters:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">char</span></code>: Placeholder character (default: <code class="docutils literal notranslate"><span class="pre">*</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">keep_start</span></code>: Number of characters to show at the beginning.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">keep_end</span></code>: Number of characters to show at the end.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">char</span></code>: Placeholder character (default: <code class="docutils literal notranslate"><span class="pre">*</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keep_start</span></code>: Characters to show at the beginning (default: 0)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">keep_end</span></code>: Characters to show at the end (default: 0)</p></li>
 </ul>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">redaction</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="c1"># Complete redaction</span>
-</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">redaction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s2">"555-0101"</span><span class="p">)</span>
-</span><span id="line-5"><span class="c1"># result: "********"</span>
-</span><span id="line-6">
-</span><span id="line-7"><span class="c1"># Keep last 4 digits (credit card pattern)</span>
-</span><span id="line-8"><span class="n">result</span> <span class="o">=</span> <span class="n">redaction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-9">    <span class="s2">"4532123456789012"</span><span class="p">,</span>
-</span><span id="line-10">    <span class="n">char</span><span class="o">=</span><span class="s2">"X"</span><span class="p">,</span>
-</span><span id="line-11">    <span class="n">keep_end</span><span class="o">=</span><span class="mi">4</span>
-</span><span id="line-12"><span class="p">)</span>
-</span><span id="line-13"><span class="c1"># result: "XXXXXXXXXXXX9012"</span>
-</span><span id="line-14">
-</span><span id="line-15"><span class="c1"># Keep first and last</span>
-</span><span id="line-16"><span class="n">result</span> <span class="o">=</span> <span class="n">redaction</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-17">    <span class="s2">"alice@example.com"</span><span class="p">,</span>
-</span><span id="line-18">    <span class="n">char</span><span class="o">=</span><span class="s2">"*"</span><span class="p">,</span>
-</span><span id="line-19">    <span class="n">keep_start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-</span><span id="line-20">    <span class="n">keep_end</span><span class="o">=</span><span class="mi">3</span>
-</span><span id="line-21"><span class="p">)</span>
-</span><span id="line-22"><span class="c1"># result: "a*****m.com"</span>
+<p><strong>In rules file:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"redact"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"keep_end"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
+</span><span id="line-5"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-6"><span class="w">  </span><span class="nt">"credit_card"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-7"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"redact"</span><span class="p">,</span>
+</span><span id="line-8"><span class="w">    </span><span class="nt">"char"</span><span class="p">:</span><span class="w"> </span><span class="s2">"X"</span><span class="p">,</span>
+</span><span id="line-9"><span class="w">    </span><span class="nt">"keep_end"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span>
+</span><span id="line-10"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-11"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-12"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"redact"</span><span class="p">,</span>
+</span><span id="line-13"><span class="w">    </span><span class="nt">"keep_start"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+</span><span id="line-14"><span class="w">    </span><span class="nt">"keep_end"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+</span><span id="line-15"><span class="w">    </span><span class="nt">"char"</span><span class="p">:</span><span class="w"> </span><span class="s2">"*"</span>
+</span><span id="line-16"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-17"><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"redact"</span>
+</span><span id="line-18"><span class="p">}</span>
 </span></code></pre></div>
 </div>
-<p><strong>Adds statistical noise while preserving overall distributions.</strong></p>
-<p>Use when: You need to keep numbers but make individual values unrecognizable.</p>
-<p>Common use: Purchase amounts, ages, salaries, temperatures.</p>
-<p>Two approaches:</p>
-<p><strong>Gaussian Noise</strong> (simple noise control):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">noise</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="c1"># Add Gaussian noise with fixed sigma</span>
-</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-</span><span id="line-5"><span class="c1"># result: 38 (or another value near 42)</span>
+<p><strong>Input data:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"555-0101"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"credit_card"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4532-1234-5678-90"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alice@example.com"</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"John Doe"</span>
+</span><span id="line-6"><span class="p">}</span>
 </span></code></pre></div>
 </div>
-<p><strong>Differential Privacy (strong privacy guarantees)</strong>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="c1"># Use Gaussian mechanism for differential privacy</span>
-</span><span id="line-2"><span class="n">result</span> <span class="o">=</span> <span class="n">noise</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-3">    <span class="mi">42</span><span class="p">,</span>
-</span><span id="line-4">    <span class="n">epsilon</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>      <span class="c1"># Privacy budget (smaller = more private)</span>
-</span><span id="line-5">    <span class="n">sensitivity</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>   <span class="c1"># Max change when one person's data changes</span>
-</span><span id="line-6">    <span class="n">delta</span><span class="o">=</span><span class="mf">1e-5</span>        <span class="c1"># Probability of breach (default)</span>
-</span><span id="line-7"><span class="p">)</span>
-</span><span id="line-8"><span class="c1"># Adds noise calibrated to (ε, δ)-differential privacy</span>
+<p><strong>Output data:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"****0101"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"credit_card"</span><span class="p">:</span><span class="w"> </span><span class="s2">"XXXXXXXXXXXX90"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a*****m.com"</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"********"</span>
+</span><span id="line-6"><span class="p">}</span>
 </span></code></pre></div>
 </div>
-<p><strong>When to use each</strong>:</p>
+<p><strong>Adds statistical noise to numeric values.</strong></p>
+<p>Use when: You need to keep numbers but make individual values unrecognizable while preserving statistical distributions.</p>
+<p>Common use: Ages, salaries, purchase amounts, measurements.</p>
+<p><strong>Two modes:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Direct sigma</strong> — Simple noise with fixed standard deviation</p></li>
+<li><p><strong>Differential Privacy</strong> — Noise calibrated for formal privacy guarantees</p></li>
+</ol>
+<p><strong>Direct Sigma Mode (simpler):</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"noise"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"sigma"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">    </span><span class="nt">"seed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"reproducible-2026"</span>
+</span><span id="line-6"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-7"><span class="w">  </span><span class="nt">"salary"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-8"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"noise"</span><span class="p">,</span>
+</span><span id="line-9"><span class="w">    </span><span class="nt">"sigma"</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span>
+</span><span id="line-10"><span class="w">    </span><span class="nt">"precision"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+</span><span id="line-11"><span class="w">    </span><span class="nt">"min_val"</span><span class="p">:</span><span class="w"> </span><span class="mi">20000</span><span class="p">,</span>
+</span><span id="line-12"><span class="w">    </span><span class="nt">"max_val"</span><span class="p">:</span><span class="w"> </span><span class="mi">500000</span><span class="p">,</span>
+</span><span id="line-13"><span class="w">    </span><span class="nt">"seed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"reproducible-2026"</span>
+</span><span id="line-14"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-15"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Differential Privacy Mode (stronger):</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"salary"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"noise"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"epsilon"</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">    </span><span class="nt">"sensitivity"</span><span class="p">:</span><span class="w"> </span><span class="mi">10000</span><span class="p">,</span>
+</span><span id="line-6"><span class="w">    </span><span class="nt">"delta"</span><span class="p">:</span><span class="w"> </span><span class="mf">1e-5</span><span class="p">,</span>
+</span><span id="line-7"><span class="w">    </span><span class="nt">"min_val"</span><span class="p">:</span><span class="w"> </span><span class="mi">20000</span><span class="p">,</span>
+</span><span id="line-8"><span class="w">    </span><span class="nt">"max_val"</span><span class="p">:</span><span class="w"> </span><span class="mi">500000</span><span class="p">,</span>
+</span><span id="line-9"><span class="w">    </span><span class="nt">"seed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"reproducible-2026"</span>
+</span><span id="line-10"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-11"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Parameters explained:</strong></p>
 <ul class="simple">
-<li><p><strong>Direct sigma</strong>: Simple noise for exploratory analysis.</p></li>
-<li><p><strong>Differential Privacy</strong>: Strong, formal privacy guarantees (GDPR-friendly).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigma</span></code>: Standard deviation of noise. Larger = more noise = more privacy.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seed</span></code>: Optional. Use the same seed to reproduce identical noise (useful for consistent anonymization across datasets).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min_val</span></code>: Minimum value after noise (clip lower bound).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_val</span></code>: Maximum value after noise (clip upper bound).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">precision</span></code>: Round to N decimal places (0 = integer).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">epsilon</span></code>: Privacy budget (smaller = stronger privacy).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sensitivity</span></code>: Maximum change in output when one person’s data changes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">delta</span></code>: Probability of privacy breach (default: 1e-5).</p></li>
 </ul>
+<p><strong>Example 1: Direct Sigma Mode</strong></p>
+<p><em>Rules:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"noise"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"sigma"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">    </span><span class="nt">"seed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"reproducible-2026"</span>
+</span><span id="line-6"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-7"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Input data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"visitor_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"V-001"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Output data (example):</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">42</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"visitor_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"V-001"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Noise is random, so the same input produces different output each run. Larger <code class="docutils literal notranslate"><span class="pre">sigma</span></code> = more privacy but more data distortion.</p>
+</div>
+<p><strong>Example 2: With Clipping Bounds</strong></p>
+<p><em>Rules:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"salary"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"noise"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"sigma"</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">    </span><span class="nt">"min_val"</span><span class="p">:</span><span class="w"> </span><span class="mi">20000</span><span class="p">,</span>
+</span><span id="line-6"><span class="w">    </span><span class="nt">"max_val"</span><span class="p">:</span><span class="w"> </span><span class="mi">150000</span><span class="p">,</span>
+</span><span id="line-7"><span class="w">    </span><span class="nt">"seed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"reproducible-2026"</span>
+</span><span id="line-8"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-9"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Input data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"salary"</span><span class="p">:</span><span class="w"> </span><span class="mi">95000</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"dept"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Engineering"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Output data (example):</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"salary"</span><span class="p">:</span><span class="w"> </span><span class="mi">98234</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"dept"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Engineering"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
 <p><strong>Coarsens data to broader categories.</strong></p>
-<p>Use when: You want to keep categories but hide specifics.</p>
-<p>Common use: Dates (year only), locations (state instead of city), ages (age groups).</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="kn">from</span><span class="w"> </span><span class="nn">maskme.strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">generalization</span>
-</span><span id="line-2">
-</span><span id="line-3"><span class="c1"># Generalize date to year</span>
-</span><span id="line-4"><span class="n">result</span> <span class="o">=</span> <span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-5">    <span class="s2">"2024-03-15"</span><span class="p">,</span>
-</span><span id="line-6">    <span class="n">method</span><span class="o">=</span><span class="s2">"date_year"</span>
-</span><span id="line-7"><span class="p">)</span>
-</span><span id="line-8"><span class="c1"># result: "2024"</span>
-</span><span id="line-9">
-</span><span id="line-10"><span class="c1"># Generalize age to bracket with custom bins</span>
-</span><span id="line-11"><span class="n">result</span> <span class="o">=</span> <span class="n">generalization</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
-</span><span id="line-12">    <span class="mi">28</span><span class="p">,</span>
-</span><span id="line-13">    <span class="n">bins</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
-</span><span id="line-14">    <span class="n">method</span><span class="o">=</span><span class="s2">"range"</span>
-</span><span id="line-15"><span class="p">)</span>
-</span><span id="line-16"><span class="c1"># result: "18-30"</span>
+<p>Use when: You want to keep the type of information but remove specificity.</p>
+<p>Common use: Dates (year only), locations (state instead of city), ages (brackets).</p>
+<p><strong>For numeric data (ages, scores, amounts):</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"step"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"range"</span>
+</span><span id="line-6"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-7"><span class="w">  </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-8"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-9"><span class="w">    </span><span class="nt">"bins"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">],</span>
+</span><span id="line-10"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"range"</span>
+</span><span id="line-11"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-12"><span class="p">}</span>
 </span></code></pre></div>
 </div>
-<p>Use this decision tree:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">Is this field sensitive?
-</span><span id="line-2">├─ No → keep
-</span><span id="line-3">├─ Yes, and I need to link records → hash
-</span><span id="line-4">├─ Yes, and I need some pattern → redact
-</span><span id="line-5">├─ Yes, and it's numeric → noise (or generalization)
-</span><span id="line-6">├─ Yes, and I don't need it → drop
-</span><span id="line-7">└─ Yes, and it's categorical → generalization
+<p><strong>For dates:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"birth_date"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"date_year"</span>
+</span><span id="line-5"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-6"><span class="w">  </span><span class="nt">"visit_month"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-7"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-8"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"date_month"</span>
+</span><span id="line-9"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-10"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>For locations (comma-separated):</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"full_address"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"depth"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+</span><span id="line-5"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-6"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">step</span></code>: Fixed bracket size (e.g., 10 for ages 0-10, 10-20, etc.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bins</span></code>: Custom brackets [0, 18, 30, 50, 100] → “0-18”, “18-30”, etc.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">method</span></code>: <code class="docutils literal notranslate"><span class="pre">"range"</span></code> (shows bracket), <code class="docutils literal notranslate"><span class="pre">"floor"</span></code> (lower bound only), <code class="docutils literal notranslate"><span class="pre">"date_year"</span></code>, <code class="docutils literal notranslate"><span class="pre">"date_month"</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">depth</span></code>: For locations, number of leading parts to remove</p></li>
+</ul>
+<p><strong>Example 1: Numeric with Step</strong></p>
+<p><em>Rules:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"step"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span>
+</span><span id="line-5"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"range"</span>
+</span><span id="line-6"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-7"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Input data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="mi">27</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alice"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Output data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"age"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20-30"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alice"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Example 2: Custom Bins</strong></p>
+<p><em>Rules:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"bins"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="mi">70</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">],</span>
+</span><span id="line-5"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"range"</span>
+</span><span id="line-6"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-7"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Input data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="mi">87</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"student_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"S-456"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Output data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"score"</span><span class="p">:</span><span class="w"> </span><span class="s2">"70-90"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"student_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"S-456"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Example 3: Dates</strong></p>
+<p><em>Rules:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"birth_date"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"date_year"</span>
+</span><span id="line-5"><span class="w">  </span><span class="p">},</span>
+</span><span id="line-6"><span class="w">  </span><span class="nt">"visit_date"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-7"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-8"><span class="w">    </span><span class="nt">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"date_month"</span>
+</span><span id="line-9"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-10"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Input data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"birth_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1995-06-15"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"visit_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2024-03-15"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Output data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"birth_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1995"</span><span class="p">,</span>
+</span><span id="line-3"><span class="w">  </span><span class="nt">"visit_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2024-03"</span>
+</span><span id="line-4"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Example 4: Locations</strong></p>
+<p><em>Rules:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"full_address"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="line-3"><span class="w">    </span><span class="nt">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"generalize"</span><span class="p">,</span>
+</span><span id="line-4"><span class="w">    </span><span class="nt">"depth"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+</span><span id="line-5"><span class="w">  </span><span class="p">}</span>
+</span><span id="line-6"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Input data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"full_address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"New York,USA,Home"</span>
+</span><span id="line-3"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><em>Output data:</em></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>
+</span><span id="line-2"><span class="w">  </span><span class="nt">"full_address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"USA,Home"</span>
+</span><span id="line-3"><span class="p">}</span>
+</span></code></pre></div>
+</div>
+<p><strong>Privacy regulations like HIPAA require a structured approach to data anonymization:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span><code><span id="line-1">STEP 1: Remove Direct Identifiers (HIPAA Requirement)
+</span><span id="line-2">├─ Is it a direct identifier? (name, SSN, medical record ID, etc.)
+</span><span id="line-3">│  └─ YES → drop
+</span><span id="line-4">│  └─ NO → go to STEP 2
+</span><span id="line-5">
+</span><span id="line-6">STEP 2: Handle Quasi-Identifiers (Latanya Sweeney's Research)
+</span><span id="line-7">│
+</span><span id="line-8">│  Note: Deletion alone is not sufficient.
+</span><span id="line-9">│  Quasi-identifiers can be re-linked to external data.
+</span><span id="line-10">│  Example: Birthdate + zipcode can re-identify in 87% of US population
+</span><span id="line-11">│
+</span><span id="line-12">├─ Is it a quasi-identifier? (age, zipcode, birthdate, etc.)
+</span><span id="line-13">│  ├─ Age/Income/Numeric → generalize (brackets) or noise
+</span><span id="line-14">│  ├─ Date → generalize (year/month only)
+</span><span id="line-15">│  ├─ Location → generalize (depth)
+</span><span id="line-16">│  └─ NO → go to STEP 3
+</span><span id="line-17">
+</span><span id="line-18">STEP 3: Preserve Analytical Payloads
+</span><span id="line-19">├─ Is it analysis-critical? (medical codes, procedures, measurements)
+</span><span id="line-20">│  ├─ Sensitive + Need Linkage → hash (consistent transformation)
+</span><span id="line-21">│  ├─ Sensitive + Need Pattern → redact (partial visibility)
+</span><span id="line-22">│  ├─ Sensitive + Numeric → noise (with bounds)
+</span><span id="line-23">|  └─ Needed information → keep
+</span><span id="line-24">│  └─ NO → go to STEP 4
+</span><span id="line-25">
+</span><span id="line-26">STEP 4: Non-Sensitive Data
+</span><span id="line-27">└─ Not sensitive, not quasi-identifier → keep
 </span></code></pre></div>
 </div>
 </section>
@@ -366,15 +649,15 @@
 <section id="part-4-real-world-example">
 <h1>Part 4: Real-World Example</h1>
 <p>Let’s put it all together with a realistic scenario:</p>
-<p><strong>Scenario</strong>: Healthcare organization wants to share patient visit data for research while protecting privacy.</p>
-<p><strong>Data fields</strong>:</p>
+<p><strong>Scenario</strong>: Healthcare organization wants to share patient visit data for research while protecting privacy and meeting HIPAA compliance requirements.</p>
+<p><strong>Field classification</strong> (using privacy-compliance decision tree):</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">patient_id</span></code>: Unique identifier → <code class="docutils literal notranslate"><span class="pre">drop</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">age</span></code>: Sensitive, numeric → <code class="docutils literal notranslate"><span class="pre">generalize</span></code> (to age brackets)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">postal_code</span></code>: Quasi-identifier → <code class="docutils literal notranslate"><span class="pre">generalize</span></code> (to state)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">diagnosis</span></code>: Sensitive → <code class="docutils literal notranslate"><span class="pre">hash</span></code> (preserve patterns for linkage)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">visit_date</span></code>: Quasi-identifier → <code class="docutils literal notranslate"><span class="pre">generalize</span></code> (year only)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">medication</span></code>: Not sensitive → <code class="docutils literal notranslate"><span class="pre">keep</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">patient_id</span></code>: Direct identifier → <code class="docutils literal notranslate"><span class="pre">drop</span></code> (STEP 1: Remove direct identifiers per HIPAA)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">age</span></code>: Quasi-identifier → <code class="docutils literal notranslate"><span class="pre">generalize</span></code> (STEP 2: Protect quasi-identifiers as per Latanya Sweeney’s research)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">postal_code</span></code>: Quasi-identifier → <code class="docutils literal notranslate"><span class="pre">generalize</span></code> (STEP 2: Postal code + age can re-identify individuals)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">diagnosis</span></code>: Analytical payload → <code class="docutils literal notranslate"><span class="pre">hash</span></code> (STEP 3: Preserve for research while protecting identity)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">visit_date</span></code>: Quasi-identifier → <code class="docutils literal notranslate"><span class="pre">generalize</span></code> (STEP 2: Protect date information)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">medication</span></code>: Non-sensitive → <code class="docutils literal notranslate"><span class="pre">keep</span></code> (STEP 4: Analytical value without privacy risk)</p></li>
 </ul>
 <p><strong>Rules file</strong> (<code class="docutils literal notranslate"><span class="pre">healthcare_rules.json</span></code>):</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><code><span id="line-1"><span class="p">{</span>

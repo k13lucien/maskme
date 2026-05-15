@@ -139,13 +139,32 @@ Use when: The field is already public, non-sensitive, or represent key analytica
 
 Example: Geographic region, product category, or timestamp.
 
-.. code-block:: python
+In rules file:
 
-   from maskme.strategies import noop
+.. code-block:: json
 
-   value = "US-CA"
-   result = noop.apply(value)
-   # result: "US-CA"
+   {
+     "region": "keep",
+     "category": "keep"
+   }
+
+**Input data:**
+
+.. code-block:: json
+
+   {
+     "region": "US-West",
+     "category": "Electronics"
+   }
+
+**Output data:**
+
+.. code-block:: json
+
+   {
+     "region": "US-West",
+     "category": "Electronics"
+   }
 
 Strategy: Drop
 ~~~~~~~~~~~~~~
@@ -156,13 +175,32 @@ Use when: The field is a direct identifier (PII) that could lead to re-identific
 
 Example: Names, email addresses, phone numbers, social security numbers.
 
-.. code-block:: python
+In rules file:
 
-   from maskme.strategies import drop
+.. code-block:: json
 
-   value = 12345
-   result = drop.apply(value)
-   # result: "__DROP__"  (signals the engine to remove this field)
+   {
+     "user_id": "drop",
+     "internal_ref": "drop"
+   }
+
+**Input data:**
+
+.. code-block:: json
+
+   {
+     "user_id": "USR-12345",
+     "internal_ref": "REF-999",
+     "email": "john@example.com"
+   }
+
+**Output data:**
+
+.. code-block:: json
+
+   {
+     "email": "john@example.com"
+   }
 
 Strategy: Hash
 ~~~~~~~~~~~~~~
@@ -171,156 +209,466 @@ Strategy: Hash
 
 Use when: You need a consistent, one-way transformation (cannot be reversed).
 
-Common use: Usernames, customer IDs when consistency is important.
+Common use: Email addresses, usernames, customer IDs when consistency matters for record linking.
 
-Parameters:
+**Parameters:**
 
-- ``algo``: Hashing algorithm (default: ``sha256``). Can be ``sha512``, ``blake2b``, etc.
-- ``salt``: Optional string mixed into the hash for extra security.
+- ``algo``: Hashing algorithm — ``sha256`` (default), ``sha512``, ``blake2b``, etc.
+- ``salt``: Recommended. Salt string for extra security. Same input + same salt = same output.
 
-.. code-block:: python
+**In rules file:**
 
-   from maskme.strategies import hashing
+.. code-block:: json
 
-   # Basic hash
-   result = hashing.apply("alice@example.com")
-   # result: "d6d5d09f12b3f0f1a8a2c1e3b5e7d9f2"
+   {
+     "email": "hash",
+     "customer_id": {
+       "strategy": "hash",
+       "salt": "my-org-secret-2026"
+     },
+     "diagnosis_code": {
+       "strategy": "hash",
+       "algo": "sha512",
+       "salt": "healthcare-key"
+     }
+   }
 
-   # Hash with algorithm
-   result = hashing.apply(
-       "alice@example.com",
-       algo="sha512"
-   )
+**Input data:**
 
-   # Hash with salt (recommended for production)
-   result = hashing.apply(
-       "alice@example.com",
-       salt="my-secret-key-2026"
-   )
+.. code-block:: json
 
-**Important**: Same input + same salt = same output (useful for linking records), but different salt = different hash.
+   {
+     "email": "alice@example.com",
+     "customer_id": "CUST-5678",
+     "diagnosis_code": "E11.9"
+   }
+
+**Output data:**
+
+.. code-block:: json
+
+   {
+     "email": "2a7f8e9c3b1d5f4a6e8c9b1d3f5a7e8c",
+     "customer_id": "f4d8b7a9c1e3f5d9b2a4c6e8f1a3d5b7",
+     "diagnosis_code": "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4ca1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6"
+   }
+
+.. note::
+
+   Same input + same salt = same output. This is useful for linking records across datasets.
 
 Strategy: Redact
 ~~~~~~~~~~~~~~~~
 
 **Replaces characters with a placeholder, preserving length.**
 
-Use when: You need to keep some information (partial numbers, patterns) while hiding the rest.
+Use when: You need some visible information (like last 4 digits) while hiding the rest.
 
-Common use: Phone numbers, credit card numbers, postal codes.
+Common use: Phone numbers, credit cards, partially-visible IDs.
 
-Parameters:
+**Parameters:**
 
-- ``char``: Placeholder character (default: ``*``).
-- ``keep_start``: Number of characters to show at the beginning.
-- ``keep_end``: Number of characters to show at the end.
+- ``char``: Placeholder character (default: ``*``)
+- ``keep_start``: Characters to show at the beginning (default: 0)
+- ``keep_end``: Characters to show at the end (default: 0)
 
-.. code-block:: python
+**In rules file:**
 
-   from maskme.strategies import redaction
+.. code-block:: json
 
-   # Complete redaction
-   result = redaction.apply("555-0101")
-   # result: "********"
+   {
+     "phone": {
+       "strategy": "redact",
+       "keep_end": 4
+     },
+     "credit_card": {
+       "strategy": "redact",
+       "char": "X",
+       "keep_end": 4
+     },
+     "email": {
+       "strategy": "redact",
+       "keep_start": 1,
+       "keep_end": 3,
+       "char": "*"
+     },
+     "name": "redact"
+   }
 
-   # Keep last 4 digits (credit card pattern)
-   result = redaction.apply(
-       "4532123456789012",
-       char="X",
-       keep_end=4
-   )
-   # result: "XXXXXXXXXXXX9012"
+**Input data:**
 
-   # Keep first and last
-   result = redaction.apply(
-       "alice@example.com",
-       char="*",
-       keep_start=1,
-       keep_end=3
-   )
-   # result: "a*****m.com"
+.. code-block:: json
+
+   {
+     "phone": "555-0101",
+     "credit_card": "4532-1234-5678-90",
+     "email": "alice@example.com",
+     "name": "John Doe"
+   }
+
+**Output data:**
+
+.. code-block:: json
+
+   {
+     "phone": "****0101",
+     "credit_card": "XXXXXXXXXXXX90",
+     "email": "a*****m.com",
+     "name": "********"
+   }
 
 Strategy: Noise
 ~~~~~~~~~~~~~~~
 
-**Adds statistical noise while preserving overall distributions.**
+**Adds statistical noise to numeric values.**
 
-Use when: You need to keep numbers but make individual values unrecognizable.
+Use when: You need to keep numbers but make individual values unrecognizable while preserving statistical distributions.
 
-Common use: Purchase amounts, ages, salaries, temperatures.
+Common use: Ages, salaries, purchase amounts, measurements.
 
-Two approaches:
+**Two modes:**
 
-**Gaussian Noise** (simple noise control):
+1. **Direct sigma** — Simple noise with fixed standard deviation
+2. **Differential Privacy** — Noise calibrated for formal privacy guarantees
 
-.. code-block:: python
+**Direct Sigma Mode (simpler):**
 
-   from maskme.strategies import noise
+.. code-block:: json
 
-   # Add Gaussian noise with fixed sigma
-   result = noise.apply(42, sigma=5)
-   # result: 38 (or another value near 42)
+   {
+     "age": {
+       "strategy": "noise",
+       "sigma": 2,
+       "seed": "reproducible-2026"
+     },
+     "salary": {
+       "strategy": "noise",
+       "sigma": 5000,
+       "precision": 0,
+       "min_val": 20000,
+       "max_val": 500000,
+       "seed": "reproducible-2026"
+     }
+   }
 
-**Differential Privacy (strong privacy guarantees)**:
+**Differential Privacy Mode (stronger):**
 
-.. code-block:: python
+.. code-block:: json
 
-   # Use Gaussian mechanism for differential privacy
-   result = noise.apply(
-       42,
-       epsilon=0.5,      # Privacy budget (smaller = more private)
-       sensitivity=10,   # Max change when one person's data changes
-       delta=1e-5        # Probability of breach (default)
-   )
-   # Adds noise calibrated to (ε, δ)-differential privacy
+   {
+     "salary": {
+       "strategy": "noise",
+       "epsilon": 1.0,
+       "sensitivity": 10000,
+       "delta": 1e-5,
+       "min_val": 20000,
+       "max_val": 500000,
+       "seed": "reproducible-2026"
+     }
+   }
 
-**When to use each**:
+**Parameters explained:**
 
-- **Direct sigma**: Simple noise for exploratory analysis.
-- **Differential Privacy**: Strong, formal privacy guarantees (GDPR-friendly).
+- ``sigma``: Standard deviation of noise. Larger = more noise = more privacy.
+- ``seed``: Optional. Use the same seed to reproduce identical noise (useful for consistent anonymization across datasets).
+- ``min_val``: Minimum value after noise (clip lower bound).
+- ``max_val``: Maximum value after noise (clip upper bound).
+- ``precision``: Round to N decimal places (0 = integer).
+- ``epsilon``: Privacy budget (smaller = stronger privacy).
+- ``sensitivity``: Maximum change in output when one person's data changes.
+- ``delta``: Probability of privacy breach (default: 1e-5).
+
+**Example 1: Direct Sigma Mode**
+
+*Rules:*
+
+.. code-block:: json
+
+   {
+     "age": {
+       "strategy": "noise",
+       "sigma": 2,
+       "seed": "reproducible-2026"
+     }
+   }
+
+*Input data:*
+
+.. code-block:: json
+
+   {
+     "age": 45,
+     "visitor_id": "V-001"
+   }
+
+*Output data (example):*
+
+.. code-block:: json
+
+   {
+     "age": 42,
+     "visitor_id": "V-001"
+   }
+
+.. note::
+
+   Noise is random, so the same input produces different output each run. Larger ``sigma`` = more privacy but more data distortion.
+
+**Example 2: With Clipping Bounds**
+
+*Rules:*
+
+.. code-block:: json
+
+   {
+     "salary": {
+       "strategy": "noise",
+       "sigma": 5000,
+       "min_val": 20000,
+       "max_val": 150000,
+       "seed": "reproducible-2026"
+     }
+   }
+
+*Input data:*
+
+.. code-block:: json
+
+   {
+     "salary": 95000,
+     "dept": "Engineering"
+   }
+
+*Output data (example):*
+
+.. code-block:: json
+
+   {
+     "salary": 98234,
+     "dept": "Engineering"
+   }
 
 Strategy: Generalization
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Coarsens data to broader categories.**
 
-Use when: You want to keep categories but hide specifics.
+Use when: You want to keep the type of information but remove specificity.
 
-Common use: Dates (year only), locations (state instead of city), ages (age groups).
+Common use: Dates (year only), locations (state instead of city), ages (brackets).
 
-.. code-block:: python
+**For numeric data (ages, scores, amounts):**
 
-   from maskme.strategies import generalization
+.. code-block:: json
 
-   # Generalize date to year
-   result = generalization.apply(
-       "2024-03-15",
-       method="date_year"
-   )
-   # result: "2024"
+   {
+     "age": {
+       "strategy": "generalize",
+       "step": 10,
+       "method": "range"
+     },
+     "score": {
+       "strategy": "generalize",
+       "bins": [0, 50, 70, 90, 100],
+       "method": "range"
+     }
+   }
 
-   # Generalize age to bracket with custom bins
-   result = generalization.apply(
-       28,
-       bins=[0, 18, 30, 50, 100],
-       method="range"
-   )
-   # result: "18-30"
+**For dates:**
 
-Choosing the Right Strategy
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code-block:: json
 
-Use this decision tree:
+   {
+     "birth_date": {
+       "strategy": "generalize",
+       "method": "date_year"
+     },
+     "visit_month": {
+       "strategy": "generalize",
+       "method": "date_month"
+     }
+   }
+
+**For locations (comma-separated):**
+
+.. code-block:: json
+
+   {
+     "full_address": {
+       "strategy": "generalize",
+       "depth": 1
+     }
+   }
+
+**Parameters:**
+
+- ``step``: Fixed bracket size (e.g., 10 for ages 0-10, 10-20, etc.)
+- ``bins``: Custom brackets [0, 18, 30, 50, 100] → "0-18", "18-30", etc.
+- ``method``: ``"range"`` (shows bracket), ``"floor"`` (lower bound only), ``"date_year"``, ``"date_month"``
+- ``depth``: For locations, number of leading parts to remove
+
+**Example 1: Numeric with Step**
+
+*Rules:*
+
+.. code-block:: json
+
+   {
+     "age": {
+       "strategy": "generalize",
+       "step": 10,
+       "method": "range"
+     }
+   }
+
+*Input data:*
+
+.. code-block:: json
+
+   {
+     "age": 27,
+     "name": "Alice"
+   }
+
+*Output data:*
+
+.. code-block:: json
+
+   {
+     "age": "20-30",
+     "name": "Alice"
+   }
+
+**Example 2: Custom Bins**
+
+*Rules:*
+
+.. code-block:: json
+
+   {
+     "score": {
+       "strategy": "generalize",
+       "bins": [0, 50, 70, 90, 100],
+       "method": "range"
+     }
+   }
+
+*Input data:*
+
+.. code-block:: json
+
+   {
+     "score": 87,
+     "student_id": "S-456"
+   }
+
+*Output data:*
+
+.. code-block:: json
+
+   {
+     "score": "70-90",
+     "student_id": "S-456"
+   }
+
+**Example 3: Dates**
+
+*Rules:*
+
+.. code-block:: json
+
+   {
+     "birth_date": {
+       "strategy": "generalize",
+       "method": "date_year"
+     },
+     "visit_date": {
+       "strategy": "generalize",
+       "method": "date_month"
+     }
+   }
+
+*Input data:*
+
+.. code-block:: json
+
+   {
+     "birth_date": "1995-06-15",
+     "visit_date": "2024-03-15"
+   }
+
+*Output data:*
+
+.. code-block:: json
+
+   {
+     "birth_date": "1995",
+     "visit_date": "2024-03"
+   }
+
+**Example 4: Locations**
+
+*Rules:*
+
+.. code-block:: json
+
+   {
+     "full_address": {
+       "strategy": "generalize",
+       "depth": 1
+     }
+   }
+
+*Input data:*
+
+.. code-block:: json
+
+   {
+     "full_address": "New York,USA,Home"
+   }
+
+*Output data:*
+
+.. code-block:: json
+
+   {
+     "full_address": "USA,Home"
+   }
+
+Choosing the Right Strategy: A Privacy-Compliance Approach
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Privacy regulations like HIPAA require a structured approach to data anonymization:**
 
 .. code-block:: text
 
-   Is this field sensitive?
-   ├─ No → keep
-   ├─ Yes, and I need to link records → hash
-   ├─ Yes, and I need some pattern → redact
-   ├─ Yes, and it's numeric → noise (or generalization)
-   ├─ Yes, and I don't need it → drop
-   └─ Yes, and it's categorical → generalization
+   STEP 1: Remove Direct Identifiers (HIPAA Requirement)
+   ├─ Is it a direct identifier? (name, SSN, medical record ID, etc.)
+   │  └─ YES → drop
+   │  └─ NO → go to STEP 2
+
+   STEP 2: Handle Quasi-Identifiers (Latanya Sweeney's Research)
+   │
+   │  Note: Deletion alone is not sufficient.
+   │  Quasi-identifiers can be re-linked to external data.
+   │  Example: Birthdate + zipcode can re-identify in 87% of US population
+   │
+   ├─ Is it a quasi-identifier? (age, zipcode, birthdate, etc.)
+   │  ├─ Age/Income/Numeric → generalize (brackets) or noise
+   │  ├─ Date → generalize (year/month only)
+   │  ├─ Location → generalize (depth)
+   │  └─ NO → go to STEP 3
+
+   STEP 3: Preserve Analytical Payloads
+   ├─ Is it analysis-critical? (medical codes, procedures, measurements)
+   │  ├─ Sensitive + Need Linkage → hash (consistent transformation)
+   │  ├─ Sensitive + Need Pattern → redact (partial visibility)
+   │  ├─ Sensitive + Numeric → noise (with bounds)
+   |  └─ Needed information → keep
+   │  └─ NO → go to STEP 4
+
+   STEP 4: Non-Sensitive Data
+   └─ Not sensitive, not quasi-identifier → keep
 
 Part 3: Measuring Privacy and Utility
 ====================================
@@ -331,16 +679,16 @@ Part 4: Real-World Example
 
 Let's put it all together with a realistic scenario:
 
-**Scenario**: Healthcare organization wants to share patient visit data for research while protecting privacy.
+**Scenario**: Healthcare organization wants to share patient visit data for research while protecting privacy and meeting HIPAA compliance requirements.
 
-**Data fields**:
+**Field classification** (using privacy-compliance decision tree):
 
-- ``patient_id``: Unique identifier → ``drop``
-- ``age``: Sensitive, numeric → ``generalize`` (to age brackets)
-- ``postal_code``: Quasi-identifier → ``generalize`` (to state)
-- ``diagnosis``: Sensitive → ``hash`` (preserve patterns for linkage)
-- ``visit_date``: Quasi-identifier → ``generalize`` (year only)
-- ``medication``: Not sensitive → ``keep``
+- ``patient_id``: Direct identifier → ``drop`` (STEP 1: Remove direct identifiers per HIPAA)
+- ``age``: Quasi-identifier → ``generalize`` (STEP 2: Protect quasi-identifiers as per Latanya Sweeney's research)
+- ``postal_code``: Quasi-identifier → ``generalize`` (STEP 2: Postal code + age can re-identify individuals)
+- ``diagnosis``: Analytical payload → ``hash`` (STEP 3: Preserve for research while protecting identity)
+- ``visit_date``: Quasi-identifier → ``generalize`` (STEP 2: Protect date information)
+- ``medication``: Non-sensitive → ``keep`` (STEP 4: Analytical value without privacy risk)
 
 **Rules file** (``healthcare_rules.json``):
 
