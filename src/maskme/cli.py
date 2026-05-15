@@ -1,17 +1,15 @@
 """
 maskme.cli
 ~~~~~~~~~~
-Command-line entry point for the MaskMe anonymization pipeline.
+Command-line entry point.
 
-Usage examples:
-    # File to file (format inferred from extension)
+Usage:
+    maskme mask --rules rules.json --input data.csv --output out.csv
+    maskme analyze risk --input data.csv --qi age zip --sa diagnosis [--report report.html]
+    maskme analyze utility --original orig.csv --anonymized anon.csv [--report report.html]
+
+Legacy flat syntax (still works):
     maskme --rules rules.json --input data.csv --output out.csv
-
-    # Stdin to stdout with explicit format
-    cat data.jsonl | maskme --rules rules.json --format jsonl > out.jsonl
-
-    # Dry-run on first 100 records
-    maskme --rules rules.json --input data.csv --limit 100
 
 Environment variables:
     MASKME_SALT   Global salt for cryptographic operations (overridden by --salt).
@@ -25,13 +23,19 @@ import sys
 from contextlib import contextmanager
 from itertools import islice
 from pathlib import Path
-from typing import Any, Dict, Generator, Optional, Tuple
+from typing import Any, Dict, Generator, List, Optional, Tuple
 
 from maskme.core.engine import MaskMe
 from maskme.io import IO_HANDLERS, get_handler
 from maskme.strategies import STRATEGIES
 
-# Derived from the single source of truth — never duplicate this list.
+from maskme.analytics.risk import METRICS as RISK_METRICS
+from maskme.analytics.risk import run as run_risk
+from maskme.analytics.risk import report as risk_report
+from maskme.analytics.utility import METRICS as UTILITY_METRICS
+from maskme.analytics.utility import run as run_utility
+from maskme.analytics.utility import report as utility_report
+
 SUPPORTED_FORMATS = list(IO_HANDLERS.keys())
 DEFAULT_FORMAT = "csv"
 PROGRESS_INTERVAL = 1000
@@ -48,19 +52,7 @@ logger = logging.getLogger(__name__)
 # Configuration helpers
 # ---------------------------------------------------------------------------
 
-def detect_format(input_path: Optional[str], output_path: Optional[str]) -> str:
-    """
-    Infer the data format from file extensions.
-
-    Priority: input extension → output extension → DEFAULT_FORMAT.
-
-    Args:
-        input_path:  Path to the input file, or None for stdin.
-        output_path: Path to the output file, or None for stdout.
-
-    Returns:
-        The inferred format string (e.g. "csv", "jsonl").
-    """
+def detect_format(input_path: Optional[str], output_path: Optional[str] = None) -> str:
     for path in [input_path, output_path]:
         if path:
             ext = Path(path).suffix.lower().lstrip(".")
@@ -70,19 +62,6 @@ def detect_format(input_path: Optional[str], output_path: Optional[str]) -> str:
 
 
 def load_rules(rules_path: str) -> Dict[str, Any]:
-    """
-    Load and parse a JSON rules file.
-
-    Args:
-        rules_path: Path to the JSON file containing masking rules.
-
-    Returns:
-        Parsed rules as a dict.
-
-    Raises:
-        FileNotFoundError: If the file does not exist.
-        ValueError:        If the file contains invalid JSON.
-    """
     try:
         with open(rules_path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -93,25 +72,11 @@ def load_rules(rules_path: str) -> Dict[str, Any]:
 
 
 def validate_rules(rules: Dict[str, Any], strategies: Dict[str, Any]) -> None:
-    """
-    Verify that all strategy names in the rules exist in the registry.
-
-    Receiving strategies as a parameter makes this function testable
-    without coupling it to the global STRATEGIES import.
-
-    Args:
-        rules:      The masking rules dict (path → strategy config).
-        strategies: The strategy registry to validate against.
-
-    Raises:
-        ValueError: If one or more strategy names are not registered.
-    """
     invalid = []
     for path, config in rules.items():
         name = config.get("strategy") if isinstance(config, dict) else config
         if name not in strategies:
             invalid.append(f"  {path}: '{name}'")
-
     if invalid:
         raise ValueError(
             "Invalid strategies found in rules:\n" + "\n".join(invalid)
@@ -127,18 +92,6 @@ def get_streams(
     input_path: Optional[str],
     output_path: Optional[str],
 ) -> Generator[Tuple[Any, Any], None, None]:
-    """
-    Context manager that opens input and output streams safely.
-
-    Falls back to sys.stdin / sys.stdout when paths are not provided.
-
-    Args:
-        input_path:  Path to the input file, or None for stdin.
-        output_path: Path to the output file, or None for stdout.
-
-    Yields:
-        (input_stream, output_stream) tuple.
-    """
     input_stream = (
         open(input_path, "r", encoding="utf-8") if input_path else sys.stdin
     )
@@ -159,16 +112,6 @@ def get_streams(
 def tracking_iterator(
     it: Generator, interval: int = PROGRESS_INTERVAL
 ) -> Generator:
-    """
-    Wrap an iterator to log progress at regular intervals.
-
-    Args:
-        it:       The source iterator to wrap.
-        interval: Number of records between each progress log.
-
-    Yields:
-        Items from the source iterator, unchanged.
-    """
     count = 0
     for item in it:
         count += 1
@@ -178,71 +121,120 @@ def tracking_iterator(
     logger.info("Successfully processed %d records.", count)
 
 
+def load_records(file_path: str, data_format: str) -> List[Dict[str, Any]]:
+    """Load all records from a file into a list."""
+    handler = get_handler(data_format)
+    with get_streams(file_path, None) as (stream, _):
+        return list(handler.read(stream))
+
+
 # ---------------------------------------------------------------------------
 # Argument parsing
 # ---------------------------------------------------------------------------
 
-def parse_args() -> argparse.Namespace:
-    """Define and parse CLI arguments."""
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="MaskMe CLI: A modular tool for data anonymization.",
+        description="MaskMe: A modular tool for data anonymization and analytics.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument(
-        "--rules", required=True,
-        help="Path to the JSON file containing masking rules.",
+    sub = parser.add_subparsers(dest="command")
+
+    # -- mask subcommand ---------------------------------------------------
+    mask_p = sub.add_parser(
+        "mask",
+        help="Anonymize data using masking rules.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument(
-        "--salt",
-        help="Global salt for cryptographic operations (overrides MASKME_SALT env var).",
+    mask_p.add_argument("--rules", required=True,
+                        help="Path to the JSON file containing masking rules.")
+    mask_p.add_argument("--salt",
+                        help="Global salt (overrides MASKME_SALT env var).")
+    mask_p.add_argument("--input",
+                        help="Path to the source file (stdin if omitted).")
+    mask_p.add_argument("--output",
+                        help="Path to the destination file (stdout if omitted).")
+    mask_p.add_argument("--format", choices=SUPPORTED_FORMATS,
+                        help="Data format (inferred from extension if omitted).")
+    mask_p.add_argument("--limit", type=int,
+                        help="Limit records to process (dry-run).")
+    mask_p.add_argument("--verbose", action="store_true",
+                        help="Enable verbose logging.")
+
+    # -- analyze subcommand ------------------------------------------------
+    analyze_p = sub.add_parser(
+        "analyze",
+        help="Run re-identification risk or data utility analytics.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument(
-        "--input",
-        help="Path to the source file (reads from stdin if not provided).",
+    analyze_sub = analyze_p.add_subparsers(dest="analyze_command")
+
+    # analyze risk
+    risk_p = analyze_sub.add_parser(
+        "risk",
+        help="Re-identification risk metrics (k-anonymity, l-diversity, t-closeness).",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument(
-        "--output",
-        help="Path to the destination file (writes to stdout if not provided).",
+    risk_p.add_argument("--input", required=True,
+                        help="Path to the anonymised dataset.")
+    risk_p.add_argument("--qi", "--quasi-identifiers",
+                        nargs="+", required=True, dest="qi",
+                        help="Quasi-identifier field names (space-separated).")
+    risk_p.add_argument("--sa", "--sensitive-attr",
+                        required=True, dest="sa",
+                        help="Sensitive attribute field name.")
+    risk_p.add_argument("--metrics", nargs="+",
+                        choices=list(RISK_METRICS.keys()),
+                        default=list(RISK_METRICS.keys()),
+                        help="Risk metrics to compute.")
+    risk_p.add_argument("--k-threshold", type=int, default=2,
+                        help="Minimum equivalence class size for k-anonymity.")
+    risk_p.add_argument("--l-threshold", type=int, default=2,
+                        help="Minimum distinct sensitive values for l-diversity.")
+    risk_p.add_argument("--t-threshold", type=float, default=0.2,
+                        help="Maximum EMD per class for t-closeness.")
+    risk_p.add_argument("--report",
+                        help="Path to write the HTML risk report.")
+    risk_p.add_argument("--format", choices=SUPPORTED_FORMATS,
+                        help="Data format (inferred from extension if omitted).")
+    risk_p.add_argument("--verbose", action="store_true",
+                        help="Enable verbose logging.")
+
+    # analyze utility
+    util_p = analyze_sub.add_parser(
+        "utility",
+        help="Data utility metrics (field retention, statistical fidelity, information loss).",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument(
-        "--format", choices=SUPPORTED_FORMATS,
-        help="Data format. Inferred from file extensions if not provided.",
-    )
-    parser.add_argument(
-        "--limit", type=int,
-        help="Limit the number of records to process (useful for dry-runs).",
-    )
-    parser.add_argument(
-        "--verbose", action="store_true",
-        help="Enable verbose logging.",
-    )
-    return parser.parse_args()
+    util_p.add_argument("--original", required=True,
+                        help="Path to the original (pre-mask) dataset.")
+    util_p.add_argument("--anonymized", required=True,
+                        help="Path to the anonymised dataset.")
+    util_p.add_argument("--numerical-fields", nargs="+",
+                        help="Numerical field names (auto-detected if omitted).")
+    util_p.add_argument("--categorical-fields", nargs="+",
+                        help="Categorical field names (auto-detected if omitted).")
+    util_p.add_argument("--metrics", nargs="+",
+                        choices=list(UTILITY_METRICS.keys()),
+                        default=list(UTILITY_METRICS.keys()),
+                        help="Utility metrics to compute.")
+    util_p.add_argument("--report",
+                        help="Path to write the HTML utility report.")
+    util_p.add_argument("--format", choices=SUPPORTED_FORMATS,
+                        help="Data format (inferred from extension if omitted).")
+    util_p.add_argument("--verbose", action="store_true",
+                        help="Enable verbose logging.")
+
+    return parser
 
 
 # ---------------------------------------------------------------------------
-# Pipeline
+# Masking pipeline
 # ---------------------------------------------------------------------------
 
-def run_pipeline(args: argparse.Namespace) -> None:
-    """
-    Orchestrate the full data anonymization pipeline.
-
-    Steps:
-        1. Resolve configuration (format, salt, rules).
-        2. Validate rules against the strategy registry.
-        3. Stream records through the engine and write output.
-
-    Args:
-        args: Parsed CLI arguments.
-
-    Raises:
-        FileNotFoundError: If the rules file is missing.
-        ValueError:        If rules contain unknown strategies.
-    """
+def run_mask(args: argparse.Namespace) -> None:
     if args.verbose:
         logger.setLevel(logging.DEBUG)
 
-    # 1. Format detection
     data_format = args.format or detect_format(args.input, args.output)
     if not args.format and not args.input and not args.output:
         logger.warning(
@@ -251,42 +243,162 @@ def run_pipeline(args: argparse.Namespace) -> None:
             DEFAULT_FORMAT,
         )
 
-    # 2. Rules loading and validation
     rules = load_rules(args.rules)
     validate_rules(rules, STRATEGIES)
 
-    # 3. Engine and handler setup
     salt = args.salt or os.getenv("MASKME_SALT", "")
     handler = get_handler(data_format)
     engine = MaskMe(rules, salt=salt)
 
-    # 4. Streaming pipeline
     with get_streams(args.input, args.output) as (input_stream, output_stream):
         records = handler.read(input_stream)
-
         if args.limit is not None:
             records = islice(records, args.limit)
-
         masked = engine.mask(records)
         handler.write(tracking_iterator(masked), output_stream)
 
 
 # ---------------------------------------------------------------------------
-# Entry point
+# Analytics pipelines
 # ---------------------------------------------------------------------------
+
+def _print_risk_results(results: List) -> None:
+    n_pass = sum(1 for r in results if r.passed)
+    n_total = len(results)
+    sep = "═" * 50
+    print(f"\n{sep}", file=sys.stderr)
+    print("  Re-identification Risk Report", file=sys.stderr)
+    print(f"{sep}", file=sys.stderr)
+    for r in results:
+        icon = "✓" if r.passed else "✗"
+        status = "passed" if r.passed else "FAILED"
+        print(f"  {icon}  {r.name:<20}", end="", file=sys.stderr)
+        extra = r.summary
+        if hasattr(r, "name") and "k-Anonymity" in r.name:
+            print(f"  k_min={extra.get('k_min')}  "
+                  f"{status}  ({extra.get('at_risk_records', 0)} record(s) at risk)",
+                  file=sys.stderr)
+        elif "l-Diversity" in r.name:
+            print(f"  l_min={extra.get('l_min')}  "
+                  f"{status}  ({extra.get('at_risk_classes', 0)} class(es) at risk)",
+                  file=sys.stderr)
+        elif "t-Closeness" in r.name:
+            print(f"  t_max={extra.get('t_max')}  "
+                  f"{status}  ({extra.get('at_risk_classes', 0)} class(es) at risk)",
+                  file=sys.stderr)
+        else:
+            print(f"  {status}", file=sys.stderr)
+    print(f"{sep}", file=sys.stderr)
+    print(f"  Summary: {n_pass} of {n_total} metrics PASSED\n", file=sys.stderr)
+
+
+def _print_utility_results(results: List) -> None:
+    n_pass = sum(1 for r in results if r.passed)
+    n_total = len(results)
+    sep = "═" * 50
+    print(f"\n{sep}", file=sys.stderr)
+    print("  Data Utility Report", file=sys.stderr)
+    print(f"{sep}", file=sys.stderr)
+    for r in results:
+        icon = "✓" if r.passed else "✗"
+        status = "passed" if r.passed else "FAILED"
+        print(f"  {icon}  {r.name:<25}  score={r.score:.2f}  {status}", file=sys.stderr)
+    print(f"{sep}", file=sys.stderr)
+    print(f"  Summary: {n_pass} of {n_total} metrics PASSED\n", file=sys.stderr)
+
+
+def run_analyze_risk(args: argparse.Namespace) -> None:
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+
+    data_format = args.format or detect_format(args.input)
+    records = load_records(args.input, data_format)
+
+    results = run_risk(
+        records=records,
+        quasi_identifiers=args.qi,
+        sensitive_attr=args.sa,
+        analytics=args.metrics,
+        k_threshold=args.k_threshold,
+        l_threshold=args.l_threshold,
+        t_threshold=args.t_threshold,
+    )
+
+    _print_risk_results(results)
+
+    if args.report:
+        risk_report.generate(results, args.report)
+        logger.info("Risk report written to: %s", args.report)
+
+
+def run_analyze_utility(args: argparse.Namespace) -> None:
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+
+    data_format = args.format or detect_format(args.original)
+    original = load_records(args.original, data_format)
+    anonymised = load_records(args.anonymized, data_format)
+
+    results = run_utility(
+        original=original,
+        anonymised=anonymised,
+        numerical_fields=args.numerical_fields,
+        categorical_fields=args.categorical_fields,
+        metrics=args.metrics,
+    )
+
+    _print_utility_results(results)
+
+    if args.report:
+        utility_report.generate(results, args.report)
+        logger.info("Utility report written to: %s", args.report)
+
+
+# ---------------------------------------------------------------------------
+# Dispatch
+# ---------------------------------------------------------------------------
+
+_COMMANDS = {
+    "mask": run_mask,
+    ("analyze", "risk"): run_analyze_risk,
+    ("analyze", "utility"): run_analyze_utility,
+}
+
 
 def main() -> None:
     """
-    Parse arguments and run the pipeline.
+    Parse arguments and dispatch to the appropriate subcommand.
 
     Exit codes:
         0 — success
-        1 — known error (missing file, invalid rules, bad format)
+        1 — known error (missing file, invalid input)
         2 — unexpected error (bug)
     """
+    parser = build_parser()
+
     try:
-        args = parse_args()
-        run_pipeline(args)
+        # Backward compat: if the first argument is a flag (starts with '-'),
+        # inject 'mask' so `maskme --rules ...` still works.
+        if len(sys.argv) <= 1 or sys.argv[1] in ("-h", "--help"):
+            parser.print_help()
+            sys.exit(0)
+        elif not sys.argv[1].startswith("-"):
+            args = parser.parse_args()
+        else:
+            args = parser.parse_args(["mask"] + sys.argv[1:])
+
+        if args.command == "analyze":
+            key = (args.command, args.analyze_command)
+        else:
+            key = args.command
+
+        handler = _COMMANDS.get(key)
+        if handler is None:
+            parser.print_help()
+            sys.exit(1)
+
+        handler(args)
+
     except (FileNotFoundError, ValueError) as e:
         logger.error(str(e))
         sys.exit(1)
