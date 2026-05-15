@@ -335,6 +335,16 @@ The development of the **MaskMe** was guided by the following foundational publi
 *   **HIPAA**: Standards for the de-identification of health data (Safe Harbor Method) to enable secure medical research.
 ---
 
+## Contributors
+
+Thanks to everyone who contributes to MaskMe.
+
+<a href="https://github.com/k13lucien/maskme/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=k13lucien/maskme" alt="Contributors to k13lucien/maskme" />
+</a>
+
+---
+
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
