@@ -1,7 +1,7 @@
 """
 maskme.ner.base
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-Formal contracts for the unstructured data anonymization layer.
+Core types for the NER anonymization layer.
 
 Two building blocks:
 
@@ -11,14 +11,9 @@ Two building blocks:
 Design principles:
     - Detectors are stateless functions wrapped in a class.
     - Each detector is responsible only for finding entities — never for
-      masking them. Masking is handled exclusively by masker.py.
+      masking them. Masking is handled by pipeline.py.
     - Multiple detectors can run on the same text; pipeline.py resolves
       overlapping spans.
-
-Adding a new detector (e.g. DictionaryDetector):
-    1. Create  ner/detectors/dictionary_detector.py
-    2. Implement a class that satisfies the Detector Protocol
-    3. Register it in ner/__init__.py under DETECTORS
 """
 
 from __future__ import annotations
@@ -30,59 +25,17 @@ from typing import Any, Dict, List, Optional, Protocol, runtime_checkable
 
 class EntityLabel(str, Enum):
     """
-    Standardised entity label set shared across all detectors.
+    Entity labels produced by the spaCy NER detector.
 
-    Using an enum prevents label drift between detectors (e.g. one
-    returning "PERSON" and another returning "PER").  All detectors
+    Using an enum prevents label drift between detectors. All detectors
     must map their internal labels to these values.
-
-    Labels are grouped by category:
-        Identity     — who the person is
-        Contact      — how to reach them
-        Location     — where they are
-        Temporal     — when something happened
-        Medical      — clinical and health information
-        Financial    — monetary and account data
-        Technical    — system and network identifiers
-        Organisation — institutions and companies
     """
 
-    # Identity
-    PERSON      = "PERSON" 
-
-    # Contact
-    EMAIL       = "EMAIL"
-    PHONE       = "PHONE"
-    ADDRESS     = "ADDRESS"
-
-    # Location
-    LOCATION    = "LOCATION"     # City, region, country
-    POSTAL_CODE = "POSTAL_CODE"
-
-    # Temporal
-    DATE        = "DATE"
-    TIME        = "TIME"
-    DATETIME    = "DATETIME"
-
-    # Medical
-    MEDICAL_ID  = "MEDICAL_ID"   # NIP, IPP, dossier number
-    DOSAGE      = "DOSAGE"       # e.g. "500mg", "2cp/j"
-    MEDICAL_CODE = "MEDICAL_CODE" # ICD-10, CIM-10 codes
-
-    # Financial
-    NIR         = "NIR"          # Numéro de Sécurité Sociale
-    IBAN        = "IBAN"
-    CREDIT_CARD = "CREDIT_CARD"
-
-    # Technical
-    IP_ADDRESS  = "IP_ADDRESS"
-    URL         = "URL"
-
-    # Organisation
+    PERSON       = "PERSON"
+    LOCATION     = "LOCATION"
     ORGANISATION = "ORGANISATION"
-
-    # Catch-all for domain-specific patterns not covered above
-    CUSTOM      = "CUSTOM"
+    DATE         = "DATE"
+    TIME         = "TIME"
 
 
 # ---------------------------------------------------------------------------
@@ -173,9 +126,7 @@ class Detector(Protocol):
     name: str
 
     #: Priority for span conflict resolution (higher wins).
-    #: Regex detectors default to 100 (deterministic, most reliable).
     #: spaCy detectors default to 50 (contextual but probabilistic).
-    #: Domain detectors default to 80 (curated but narrower scope).
     priority: int
 
     def detect(
