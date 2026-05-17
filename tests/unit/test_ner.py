@@ -43,7 +43,7 @@ class TestEntityOverlaps:
 
     def test_adjacent_no_overlap(self):
         a = Entity("Alice", EntityLabel.PERSON, 0, 5)
-        b = Entity("habite", EntityLabel.CUSTOM, 5, 11)
+        b = Entity("habite", EntityLabel.DATE, 5, 11)
         assert not a.overlaps(b)
         assert not b.overlaps(a)
 
@@ -92,7 +92,7 @@ class TestEntityLen:
         assert len(e) == 1
 
     def test_length_empty(self):
-        e = Entity("", EntityLabel.CUSTOM, 0, 0)
+        e = Entity("", EntityLabel.DATE, 0, 0)
         assert len(e) == 0
 
 
@@ -126,16 +126,14 @@ class TestEntityLabelValues:
             assert label.value == label.value.upper()
 
     def test_expected_count(self):
-        assert len(EntityLabel) >= 10
+        assert len(EntityLabel) == 5
 
     def test_key_members_exist(self):
         assert EntityLabel.PERSON.value == "PERSON"
-        assert EntityLabel.EMAIL.value == "EMAIL"
-        assert EntityLabel.PHONE.value == "PHONE"
         assert EntityLabel.LOCATION.value == "LOCATION"
-        assert EntityLabel.DATE.value == "DATE"
         assert EntityLabel.ORGANISATION.value == "ORGANISATION"
-        assert EntityLabel.IP_ADDRESS.value == "IP_ADDRESS"
+        assert EntityLabel.DATE.value == "DATE"
+        assert EntityLabel.TIME.value == "TIME"
 
 
 # ===================================================================
@@ -227,7 +225,7 @@ class TestResolveSpansAdjacent:
 
     def test_adjacent_both_kept(self):
         a = _entity("Alice", EntityLabel.PERSON, 0, 5)
-        b = _entity("habite", EntityLabel.CUSTOM, 5, 11)
+        b = _entity("habite", EntityLabel.DATE, 5, 11)
         result = resolve_spans([a, b])
         assert result == [a, b]
 
