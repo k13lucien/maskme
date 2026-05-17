@@ -42,30 +42,31 @@ MaskMe answers these challenges by preserving the statistical properties, distri
 MaskMe is built on the principle of **Format Agnosticism**. The transformation logic is fully decoupled from file I/O, keeping the library lightweight and infinitely adaptable.
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                        CLI                              │
-│           maskme --input data.csv --rules rules.json    │
-└──────────────┬──────────────────────────┬───────────────┘
-               │                          │
-    ┌──────────▼──────────┐   ┌───────────▼────────────┐
-    │       io/           │   │       core/engine       │
-    │  csv · json · jsonl │   │   MaskMe (agnostic)     │
-    │  (streaming I/O)    │   │   mask(data_iterator)   │
-    └─────────────────────┘   └───────────┬─────────────┘
-                                          │
-                              ┌───────────▼─────────────┐
-                              │      strategies/         │
-                              │  hash · redact · noise  │
-                              │  generalize · keep · drop│
-                              └─────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│                        CLI                                    │
+│     maskme mask --rules rules.json --input data.csv           │
+│     maskme ner rapport.txt --output clean.txt                 │
+└───────────────┬──────────────────────────┬────────────────────┘
+                │                          │
+     ┌──────────▼──────────┐   ┌───────────▼──────────────────┐
+     │       io/           │   │       core/engine            │
+     │  csv · json · jsonl │   │   MaskMe (structured data)   │
+     │  (streaming I/O)    │   │   mask(data_iterator)        │
+     └─────────────────────┘   └───────────┬──────────────────┘
+                                           │
+                               ┌───────────▼──────────────────┐
+                               │      strategies/             │
+                               │  hash · redact · noise       │
+                               │  generalize · keep · drop    │
+                               └──────────────────────────────┘
 
-┌─────────────────────┐       ┌─────────────────────────┐
-│    analytics/       │       │       utility/           │
-│  k-anonymity        │       │  Field Retention         │
-│  l-diversity        │       │  Statistical Fidelity    │
-│  t-closeness        │       │  Information Loss Index  │
-│  → risk_report.html │       │  → utility_report.html  │
-└─────────────────────┘       └─────────────────────────┘
+┌─────────────────────┐      ┌──────────────────────────┐     ┌──────────────┐
+│    analytics/       │      │       utility/           │     │    ner/      │
+│  k-anonymity        │      │  Field Retention         │     │  spaCy NER   │
+│  l-diversity        │      │  Statistical Fidelity    │     │  [PERSON]    │
+│  t-closeness        │      │  Information Loss Index  │     │  [LOCATION]  │
+│  → risk_report.html │      │  → utility_report.html   │     │  [DATE] …    │
+└─────────────────────┘      └──────────────────────────┘     └──────────────┘
 ```
 
 ### The Core Dilemma: Privacy vs. Utility
@@ -79,6 +80,24 @@ High Privacy  ◄─────────────────────
 
 ---
 
+<<<<<<< Updated upstream
+=======
+## Key Features
+
+- **Format Agnostic Core:** Processes standard Python dicts — completely decoupled from file format.
+- **Universal Support:** Designed for Structured (tables), Semi-Structured (nested JSON), and Unstructured (raw text) data.
+- **NER Module:** Detect and mask PII in free text via spaCy — names, locations, organisations, dates, times (fr + en).
+- **6 Anonymization Strategies:** From full suppression to calibrated Differential Privacy noise.
+- **Dot Notation:** Target any nested field with `user.address.city`.
+- **Streaming I/O:** Process multi-gigabyte datasets in constant memory (CSV, JSON, JSONL).
+- **Re-identification Risk Analytics:** k-anonymity, l-diversity, and t-closeness with HTML reports.
+- **Data Utility Measurement:** Field retention, statistical fidelity, and Information Loss Index.
+- **Differential Privacy:** Calibrated Gaussian noise via the formal (ε, δ)-DP Gaussian mechanism.
+- **Extensible by Design:** Adding a new strategy, I/O format, analytic, or utility metric requires one file and one registry entry — nothing else changes.
+
+---
+
+>>>>>>> Stashed changes
 ## Masking Strategies
 
 | Strategy | Parameters | Best for |
@@ -97,9 +116,13 @@ High Privacy  ◄─────────────────────
 ### Installation
 
 ```bash
+pip install maskme                    # core (no external deps)
+pip install maskme[ner]               # with NER support (spaCy + langdetect)
+
+# From source
 git clone https://github.com/k13lucien/maskme
 cd maskme
-pip install -e .
+pip install -e .[ner]
 ```
 
 ### Library Usage
@@ -142,24 +165,40 @@ engine = MaskMe(rules, salt="secret_pepper")
 masked = list(engine.mask(data))
 ```
 
-### CLI Usage
+### CLI Usage — Structured Data
 
 ```bash
 # File to file (format inferred from extension)
-maskme --rules rules.json --input data.csv --output clean.csv
+maskme mask --rules rules.json --input data.csv --output clean.csv
 
 # Streaming via pipes (explicit format required)
-cat data.jsonl | maskme --rules rules.json --format jsonl > clean.jsonl
+cat data.jsonl | maskme mask --rules rules.json --format jsonl > clean.jsonl
 
 # Dry-run on first 100 records
-maskme --rules rules.json --input data.csv --limit 100
+maskme mask --rules rules.json --input data.csv --limit 100
 
 # With a global salt and verbose logging
-maskme --rules rules.json --input data.csv --output clean.csv --salt my-secret --verbose
+maskme mask --rules rules.json --input data.csv --output clean.csv --salt my-secret --verbose
 
 # Salt from environment variable
 export MASKME_SALT=my-secret
-maskme --rules rules.json --input data.csv --output clean.csv
+maskme mask --rules rules.json --input data.csv --output clean.csv
+```
+
+### CLI Usage — Unstructured Text (NER)
+
+```bash
+# Anonymize a text file → replace names, locations, dates with [PERSON], [LOCATION], [DATE]
+maskme ner rapport.txt -o rapport_anon.txt
+
+# Batch mode: each line is a separate text
+maskme ner patients.txt --lines -o patients_anon.txt
+
+# Stdin / stdout
+cat email.txt | maskme ner -l en
+
+# Language hint
+maskme ner document.txt --language fr -o clean.txt
 ```
 
 ---
@@ -231,6 +270,42 @@ The utility score across all metrics follows the convention `score = 1 − ILI`,
 
 ---
 
+## Unstructured Text Anonymization (NER)
+
+Detect and mask PII in free text using spaCy's statistical NER models.
+
+```python
+from maskme.ner import mask
+
+# One line: text → anonymized text
+result = mask("Alice habite à Paris le 15/04/2024.")
+print(result.output)
+# '[PERSON] habite à [LOCATION] le [DATE].'
+
+# Language hint
+result = mask("John lives in London.", language="en")
+
+# Batch processing
+results = mask([
+    "Alice habite à Paris.",
+    "Jean est à Lyon.",
+])
+for r in results:
+    print(r.output)
+```
+
+| Tag | Detected by spaCy |
+|---|---|
+| `[PERSON]` | Names (PER / PERSON) |
+| `[LOCATION]` | Cities, countries, facilities (LOC / GPE / FAC) |
+| `[ORGANISATION]` | Institutions, hospitals (ORG) |
+| `[DATE]` | Temporal expressions |
+| `[TIME]` | Clock times |
+
+Requires `pip install maskme[ner]` and a spaCy model (`fr_core_news_lg` or `en_core_web_lg`). Without them the module degrades gracefully (text passes through unchanged).
+
+---
+
 ## Extending MaskMe
 
 MaskMe is designed so that adding capabilities requires **one file and one registry entry** — no other files change.
@@ -276,7 +351,6 @@ Implement the `Analytic` / `Metric` Protocol in a new file under `analytics/metr
 
 - [ ] **Adapters:** Native support for S3, SQL databases, and Parquet files.
 - [ ] **Faker Integration:** Replace real names with realistic synthetic data.
-- [ ] **Advanced NLP:** Named Entity Recognition (NER) for automated PII detection in raw text.
 - [ ] **δ-Presence:** Additional re-identification risk model.
 - [ ] **ML Utility:** Measure the impact of anonymization on model performance.
 - [ ] **Web UI:** Visual dashboard to configure rules and preview utility reports.
