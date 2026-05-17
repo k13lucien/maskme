@@ -284,7 +284,7 @@ Implement the `Analytic` / `Metric` Protocol in a new file under `analytics/metr
 
 ---
 
-## Citation
+# `Citation`
 
 If you use MaskMe in your research, please cite it as:
 
@@ -317,23 +317,20 @@ Kiemde, Lucien. "MaskMe: Agnostic Python library for data anonymization." Versio
 ```
 
 ---
-## Scientific References
-
-The architecture of **MaskMe** and its anonymization strategies are built upon established theoretical pillars in data privacy and cybersecurity research.
+# `Scientific References`
 
 ### 1. Core Literature
-The development of the **MaskMe** was guided by the following foundational publications:
-
-*  **Sweeney, L. (2002)**: *"k-anonymity: A model for protecting privacy"*. International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems. (Foundational research for quasi-identifier generalization).
-*  **Dwork, C. (2006)**: *"Differential Privacy"*. ICALP. (The theoretical basis for our Gaussian and Laplacian noise injection strategies).
-*  **Machanavajjhala, A., et al. (2007)**: *"l-diversity: Privacy beyond k-anonymity"*. ACM Transactions on Knowledge Discovery from Data (TKDD).
+The development of MaskMe was guided by the following foundational publications:
+*  **Sweeney, L. (2002)** — *"k-anonymity: A model for protecting privacy"*, International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems.
+*  **Machanavajjhala, A., et al. (2007)** — *"l-diversity: Privacy beyond k-anonymity"*, ACM Transactions on Knowledge Discovery from Data (TKDD).
+*  **Li, N., et al. (2007)** — *"t-Closeness: Privacy Beyond k-Anonymity and l-Diversity"*. IEEE 23rd International Conference on Data Engineering.
+*  **Dwork, C. (2006)** — *"Differential Privacy"*, International Colloquium on Automata, Languages, and Programming ICALP.
 
 ### 2. Legal & Compliance Frameworks
-**MaskMe** is engineered to help organizations align with major international and local data protection standards:
-
-*   **Law N°010-2004/AN (Burkina Faso)**: Specifically regarding the protection of personal data within the national context.
-*   **GDPR (EU 2016/679)**: Supporting principles of *Privacy by Design* and pseudonymization for cross-border data utility.
-*   **HIPAA**: Standards for the de-identification of health data (Safe Harbor Method) to enable secure medical research.
+MaskMe is engineered to help organizations align with major international and local data protection standards:
+* **Burkina Faso’s Act No. 001-2021/AN (30 March 2021)** — Framework for the protection of personal data within Burkina Faso.
+* **GDPR (EU 2016/679)** — Supports principles such as *Privacy by Design*, data minimization, and pseudonymization.
+* **HIPAA (US Health Insurance Portability and Accountability Act)** — Standards for the de-identification of health data (Safe Harbor Method) to enable secure medical and clinical research.
 ---
 
 ## Contributors
