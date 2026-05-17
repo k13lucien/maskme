@@ -37,14 +37,13 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Natural Language :: English",
 ]
-dependencies = [
-    "numpy>=1.24.0",
-    "matplotlib>=3.7.0",
-]
+dependencies = []
 
 [project.optional-dependencies]
-full = ["ipywidgets>=8.0.0"]
-jupyter = ["jupyter>=1.0.0", "ipywidgets>=8.0.0", "nbformat>=5.7.0"]
+ner = [
+    "spacy>=3.7.0",
+    "langdetect>=1.0.9",
+]
 dev = [
     "pytest>=7.4.0", "pytest-cov>=4.1.0", "black>=23.0.0", 
     "isort>=5.12.0", "flake8>=6.0.0", "mypy>=1.4.0", "pre-commit>=3.3.0"
