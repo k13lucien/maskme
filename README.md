@@ -14,11 +14,26 @@
 
 ---
 
-## Overview
+# `Overview`
 
-MaskMe is a lightweight, modular Python library designed to anonymize and pseudonymize data while measuring its residual statistical utility.
+MaskMe is a Python library designed for data anonymization and privacy compliance. It is built to address two critical challenges:
+* In an era where data privacy is paramount (GDPR, HIPAA, Burkina Faso’s Act No. 001-2021/AN), *how can organizations effectively protect individuals’ privacy?*
+* Data powers analytics, research, and machine learning systems. *How can anonymized data remain useful for these purposes?*
 
-In an era where data privacy is paramount (GDPR, HIPAA, Law 010), MaskMe provides a bridge between security and analytics. It allows developers to protect sensitive information across various data formats without destroying the underlying patterns needed for Data Science and Machine Learning.
+MaskMe answers these challenges by preserving the statistical properties, distributions, and behavioral patterns of datasets while anonymizing sensitive information. This enables teams to perform accurate analysis and train reliable machine learning models without exposing personal data.
+
+**Designed For:**
+* Data Scientists — Train reliable machine learning models using anonymized datasets that retain their original statistical characteristics.
+* Data Engineers — Integrate scalable anonymization workflows directly into ETL and data processing pipelines.
+* Researchers: Unlock sensitive datasets for scientific and academic work while complying with strict privacy requirements.
+
+**Key Features:**
+*  Format-Agnostic Core — lightweight and modular for developers who want to easily extend or build on top of MaskMe.
+*  Universal Data Support — Handles structured (tabular), semi-structured (nested JSON), and unstructured (raw text) data.
+*  Multiple Anonymization Strategies — Includes six built-in anonymization techniques tailored to different privacy and compliance needs.
+*  AI-Powered NER — Uses Named Entity Recognition (NER) to automatically identify and anonymize personally identifiable information (PII) in unstructured text.
+*  Risk & Utility Analytics — Provides built-in privacy metrics such as k-anonymity, l-diversity, and t-closeness, along with tools for evaluating post-anonymization data quality.
+*  Friendly CLI tool — A powerful Command Line Interface to easily configure, orchestrate, and automate your entire anonymization pipeline.
 
 ---
 
@@ -61,20 +76,6 @@ Every masking decision involves a fundamental trade-off: **the stronger the anon
 High Privacy  ◄─────────────────────────────► High Utility
    drop     hash    redact    noise    generalize    keep
 ```
-
----
-
-## Key Features
-
-- **Format Agnostic Core:** Processes standard Python dicts — completely decoupled from file format.
-- **Universal Support:** Designed for Structured (tables), Semi-Structured (nested JSON), and Unstructured (raw text) data.
-- **6 Anonymization Strategies:** From full suppression to calibrated Differential Privacy noise.
-- **Dot Notation:** Target any nested field with `user.address.city`.
-- **Streaming I/O:** Process multi-gigabyte datasets in constant memory (CSV, JSON, JSONL).
-- **Re-identification Risk Analytics:** k-anonymity, l-diversity, and t-closeness with HTML reports.
-- **Data Utility Measurement:** Field retention, statistical fidelity, and Information Loss Index.
-- **Differential Privacy:** Calibrated Gaussian noise via the formal (ε, δ)-DP Gaussian mechanism.
-- **Extensible by Design:** Adding a new strategy, I/O format, analytic, or utility metric requires one file and one registry entry — nothing else changes.
 
 ---
 
