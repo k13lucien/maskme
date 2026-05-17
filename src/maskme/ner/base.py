@@ -244,15 +244,14 @@ def resolve_spans(entities: List[Entity]) -> List[Entity]:
         if not candidate.overlaps(last):
             resolved.append(candidate)
         else:
-            # Conflict: keep the one with higher priority, then length, then score
             incumbent_score = (
                 last.end - last.start,
-                getattr(last, "priority", 50),
+                getattr(last, "priority", last.metadata.get("priority", 50)),
                 last.score,
             )
             challenger_score = (
                 candidate.end - candidate.start,
-                getattr(candidate, "priority", 50),
+                getattr(candidate, "priority", candidate.metadata.get("priority", 50)),
                 candidate.score,
             )
             if challenger_score > incumbent_score:

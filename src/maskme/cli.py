@@ -160,6 +160,23 @@ def build_parser() -> argparse.ArgumentParser:
     mask_p.add_argument("--verbose", action="store_true",
                         help="Enable verbose logging.")
 
+    # -- ner subcommand ----------------------------------------------------
+    ner_p = sub.add_parser(
+        "ner",
+        help="Anonymize unstructured text using NER (spaCy).",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    ner_p.add_argument("input", nargs="?",
+                       help="Path to a text file (stdin if omitted).")
+    ner_p.add_argument("--output", "-o",
+                       help="Path to the output file (stdout if omitted).")
+    ner_p.add_argument("--language", "-l", default=None,
+                       help="Language override ('fr' or 'en'). Auto-detected if omitted.")
+    ner_p.add_argument("--lines", action="store_true",
+                       help="Treat each line as a separate text (batch mode).")
+    ner_p.add_argument("--verbose", action="store_true",
+                       help="Enable verbose logging.")
+
     # -- analyze subcommand ------------------------------------------------
     analyze_p = sub.add_parser(
         "analyze",
@@ -225,6 +242,56 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Enable verbose logging.")
 
     return parser
+
+
+# ---------------------------------------------------------------------------
+# NER pipeline
+# ---------------------------------------------------------------------------
+
+def run_ner(args: argparse.Namespace) -> None:
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+
+    from maskme.ner import mask as ner_mask
+
+    # 1. Read input
+    if args.input:
+        with open(args.input, "r", encoding="utf-8") as f:
+            if args.lines:
+                texts = [line.rstrip("\n") for line in f]
+            else:
+                texts = f.read()
+    else:
+        if args.lines:
+            texts = [line.rstrip("\n") for line in sys.stdin]
+        else:
+            texts = sys.stdin.read()
+
+    # 2. Process
+    if args.lines:
+        results = ner_mask(texts, language=args.language)
+        outputs = [r.output for r in results]
+        n = len(outputs)
+        entity_total = sum(r.entity_count for r in results)
+    else:
+        result = ner_mask(texts, language=args.language)
+        outputs = result.output
+        n = 1
+        entity_total = result.entity_count
+
+    # 3. Write output
+    output_text = "\n".join(outputs) if args.lines else outputs
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as f:
+            f.write(output_text)
+            if args.lines:
+                f.write("\n")
+    else:
+        sys.stdout.write(output_text)
+        if args.lines:
+            sys.stdout.write("\n")
+
+    logger.info("Processed %d text(s), %d entity(ies) detected.", n, entity_total)
 
 
 # ---------------------------------------------------------------------------
@@ -359,6 +426,7 @@ def run_analyze_utility(args: argparse.Namespace) -> None:
 # ---------------------------------------------------------------------------
 
 _COMMANDS = {
+    "ner": run_ner,
     "mask": run_mask,
     ("analyze", "risk"): run_analyze_risk,
     ("analyze", "utility"): run_analyze_utility,

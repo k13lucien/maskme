@@ -46,7 +46,7 @@ class PipelineResult:
     Attributes:
         output:   Text with all detected entities replaced by tags
                   (e.g. ``[PERSON]``, ``[LOCATION]``).
-        text:     Original input text.
+        input:    Original input text.
         entities: Non-overlapping entities after span resolution,
                   sorted by start offset.
         language: Detected or overridden language code (``"fr"`` / ``"en"``).
