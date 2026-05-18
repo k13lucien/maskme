@@ -137,6 +137,10 @@ def build_parser() -> argparse.ArgumentParser:
         description="MaskMe: A modular tool for data anonymization and analytics.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+    parser.add_argument(
+        "--version", action="version", version=f"maskme {__import__('maskme').__version__}",
+        help="Show the version number and exit.",
+    )
     sub = parser.add_subparsers(dest="command")
 
     # -- mask subcommand ---------------------------------------------------
@@ -449,6 +453,9 @@ def main() -> None:
         # inject 'mask' so `maskme --rules ...` still works.
         if len(sys.argv) <= 1 or sys.argv[1] in ("-h", "--help"):
             parser.print_help()
+            sys.exit(0)
+        elif sys.argv[1] == "--version":
+            parser.parse_args(["--version"])
             sys.exit(0)
         elif not sys.argv[1].startswith("-"):
             args = parser.parse_args()
