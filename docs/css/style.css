@@ -1295,11 +1295,41 @@ footer a:hover {
     .hero {
         padding: 5rem 1rem 3rem;
     }
+
+    .hero-badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.65rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero-tagline {
+        font-size: 0.88rem;
+    }
     
     .get-started-grid {
         grid-template-columns: 1fr;
     }
     
+    .spectrum-bar {
+        height: auto;
+        flex-wrap: wrap;
+        border-radius: var(--radius-md);
+    }
+
+    .spectrum-strategy {
+        flex: 1 1 33.333%;
+        padding: 0.5rem 0.2rem;
+        font-size: 0.7rem;
+    }
+
+    .spectrum-strategy:hover {
+        flex: 1 1 33.333%;
+        font-size: 0.7rem;
+    }
+
     .spectrum-info {
         grid-template-columns: 1fr;
     }
@@ -1318,6 +1348,115 @@ footer a:hover {
         width: 100%;
         justify-content: center;
     }
+
+    .citation {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .get-started-card-body pre {
+        font-size: 0.7rem;
+        padding: 0.8rem;
+    }
+
+    section#get-started {
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .section {
+        padding: 3rem 1.2rem;
+    }
+
+    .section-header {
+        margin-bottom: 2rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .spectrum-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .spectrum-strategy {
+        flex: 1 1 50%;
+        font-size: 0.68rem;
+        padding: 0.45rem 0.15rem;
+    }
+
+    .spectrum-strategy:hover {
+        flex: 1 1 50%;
+        font-size: 0.68rem;
+    }
+
+    .strategies-grid {
+        gap: 0.8rem;
+    }
+
+    .strategy-card {
+        padding: 1.2rem 1rem;
+    }
+
+    .ref-card {
+        padding: 1.2rem 1rem;
+    }
+
+    .get-started-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .get-started-panel-left {
+        flex-direction: column;
+    }
+
+    .panel-card.shrink {
+        width: 100%;
+    }
+
+    .get-started-card-body {
+        padding: 1rem 0.8rem;
+    }
+
+    .get-started-card-body pre {
+        font-size: 0.65rem;
+        padding: 0.6rem;
+    }
+
+    footer {
+        padding: 2rem 1rem;
+    }
+
+    .footer-links {
+        gap: 1rem;
+        font-size: 0.78rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .spectrum-strategy {
+        flex: 1 1 100%;
+        font-size: 0.75rem;
+        padding: 0.5rem 0.2rem;
+    }
+
+    .spectrum-strategy:hover {
+        flex: 1 1 100%;
+        font-size: 0.75rem;
+    }
+
+    .nav-links a {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.35rem;
+    }
+
+    .hero-badge {
+        font-size: 0.62rem;
+        padding: 0.2rem 0.5rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1333,5 +1472,111 @@ footer a:hover {
 @media (min-width: 769px) and (max-width: 1024px) {
     .strategies-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================
+   LARGE SCREENS
+   ============================================ */
+@media (min-width: 1400px) {
+    .section {
+        max-width: 1200px;
+        padding: 5.5rem 3rem;
+    }
+
+    .hero-content {
+        max-width: 860px;
+    }
+
+    .hero h1 {
+        font-size: clamp(2.8rem, 4.5vw, 4.5rem);
+    }
+
+    .hero-tagline {
+        font-size: 1.05rem;
+        max-width: 640px;
+    }
+
+    .strategies-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .spectrum-info {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .get-started-panel {
+        grid-template-columns: 320px 1fr;
+    }
+
+    nav {
+        padding: 0.9rem 3rem;
+    }
+
+    .nav-links {
+        gap: 0.3rem;
+    }
+
+    .nav-links a {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+@media (min-width: 2000px) {
+    .section {
+        max-width: 1400px;
+        padding: 6rem 4rem;
+    }
+
+    .hero-content {
+        max-width: 1000px;
+    }
+
+    .hero h1 {
+        font-size: clamp(3.2rem, 4vw, 5.2rem);
+    }
+
+    .hero-tagline {
+        font-size: 1.15rem;
+        max-width: 720px;
+    }
+
+    h2 {
+        font-size: clamp(1.8rem, 2.5vw, 2.6rem);
+    }
+
+    .strategies-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.6rem;
+    }
+
+    .strategy-card {
+        padding: 2.2rem 2rem;
+    }
+
+    .get-started-panel {
+        grid-template-columns: 360px 1fr;
+    }
+
+    nav {
+        padding: 1rem 4rem;
+    }
+
+    .nav-logo {
+        font-size: 1.5rem;
+    }
+
+    .nav-links a {
+        font-size: 0.95rem;
+        padding: 0.55rem 1.1rem;
+    }
+
+    .refs-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .spectrum-container {
+        padding: 3rem 2.5rem;
     }
 }
