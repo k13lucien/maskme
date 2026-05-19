@@ -79,25 +79,6 @@ High Privacy  ◄─────────────────────
 ```
 
 ---
-
-<<<<<<< Updated upstream
-=======
-## Key Features
-
-- **Format Agnostic Core:** Processes standard Python dicts — completely decoupled from file format.
-- **Universal Support:** Designed for Structured (tables), Semi-Structured (nested JSON), and Unstructured (raw text) data.
-- **NER Module:** Detect and mask PII in free text via spaCy — names, locations, organisations, dates, times (fr + en).
-- **6 Anonymization Strategies:** From full suppression to calibrated Differential Privacy noise.
-- **Dot Notation:** Target any nested field with `user.address.city`.
-- **Streaming I/O:** Process multi-gigabyte datasets in constant memory (CSV, JSON, JSONL).
-- **Re-identification Risk Analytics:** k-anonymity, l-diversity, and t-closeness with HTML reports.
-- **Data Utility Measurement:** Field retention, statistical fidelity, and Information Loss Index.
-- **Differential Privacy:** Calibrated Gaussian noise via the formal (ε, δ)-DP Gaussian mechanism.
-- **Extensible by Design:** Adding a new strategy, I/O format, analytic, or utility metric requires one file and one registry entry — nothing else changes.
-
----
-
->>>>>>> Stashed changes
 ## Masking Strategies
 
 | Strategy | Parameters | Best for |
