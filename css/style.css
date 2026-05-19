@@ -938,6 +938,7 @@ section#get-started {
 
 .get-started-panel-right {
     width: 100%;
+    min-height: 380px;
 }
 
 .panel-card { 
@@ -1036,7 +1037,7 @@ section#get-started {
     border-color: var(--color-border);
 }
 
-@media (max-width: 768px) {
+@media (min-width: 601px) and (max-width: 768px) {
     .get-started-panel { 
         grid-template-columns: 1fr;
     }
@@ -1363,6 +1364,10 @@ footer a:hover {
         padding-left: 0.8rem;
         padding-right: 0.8rem;
     }
+
+    .get-started-panel-right {
+        min-height: 300px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -1434,6 +1439,10 @@ footer a:hover {
         gap: 1rem;
         font-size: 0.78rem;
     }
+
+    .get-started-panel-right {
+        min-height: 250px;
+    }
 }
 
 @media (max-width: 400px) {
@@ -1456,6 +1465,10 @@ footer a:hover {
     .hero-badge {
         font-size: 0.62rem;
         padding: 0.2rem 0.5rem;
+    }
+
+    .get-started-panel-right {
+        min-height: 200px;
     }
 }
 
